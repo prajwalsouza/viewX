@@ -41,7 +41,7 @@ setUpGraph()
 
 ### Adding Objects to the Graph
 
-To add objects to the graph, use the corresponding `add*` functions such as [addPoint](#222), [addPath](#addLine-), `addCircle`, and `addLine`. These functions take the graph's name and options for the object, such as its position, color, and size.
+To add objects to the graph, use the corresponding `add*` functions such as [addPoint](#222), [addPath](<README.md#L230>), `addCircle`, and `addLine`. These functions take the graph's name and options for the object, such as its position, color, and size.
 
 Example:
 
