@@ -9,6 +9,18 @@ ViewX JavaScript library contains a set of functions and utilities for creating 
 3. Customize the appearance of the graph and its elements, including colors, stroke width, and more.
 4. Control the animation and calculation loop for the simulations.
 
+### ViewX Functions List
+1. Graph/Canvas : [viewX.addGraph](#function-viewxaddgraph), [viewX.removeGraph](#function-viewxremovegraph)
+2. Line : [viewX.addLine](#function-viewxaddline), [viewX.updateLine](#function-viewxupdateline), [viewX.removeLine](#function-viewxremoveline)
+3. Path : [viewX.addPath](#function-viewxaddpath), [viewX.updatePath](#function-viewxupdatepath), [viewX.updatePathPoints](#function-viewxupdatepathpoints), [viewX.removePath](#function-viewxremovepath)
+4. Arrow : [viewX.addArrow](#function-viewxaddarrow), [viewX.updateArrow](#function-viewxupdatearrow), [viewX.removeArrow](#function-viewxremovearrow)
+5. Circle : [viewX.addCircle](#function-viewxaddcircle), [viewX.updateCircle](#function-viewxupdatecircle), [viewX.removeCircle](#function-viewxremovecircle)
+6. Ellipse : [viewX.addEllipse](#function-viewxaddellipse), [viewX.updateEllipse](#function-viewxupdateellipse)
+7. Text : [viewX.addText](#function-viewxaddtext), [viewX.updateText](#function-viewxupdatetext), [viewX.removeText](#function-viewxremovetext)
+8. Rectangle : [viewX.addRectangle](#function-viewxaddrectangle), [viewX.updateRectangle](#function-viewxupdaterectangle)
+9. Point : [viewX.addPoint](#function-viewxaddpoint), [viewX.updatePoint](#function-viewxupdatepoint), [viewX.removePoint](#function-viewxremovepoint)
+10. Arc : [viewX.makeArc](#function-viewxmakearc)
+
 ## Basic Demo
 ### Setting up the Graph
 
@@ -41,7 +53,7 @@ setUpGraph()
 
 ### Adding Objects to the Graph
 
-To add objects to the graph, use the corresponding `add*` functions such as [addPoint](#222), [addPath](<README.md#L230>), `addCircle`, and `addLine`. These functions take the graph's name and options for the object, such as its position, color, and size.
+To add objects to the graph, use the corresponding `add*` functions such as [addPoint](#function-viewxaddpoint), [addPath](#function-viewxaddpath), [addCircle](#function-viewxaddcircle), and [addLine](#function-viewxaddline). These functions take the graph's name and options for the object, such as its position, color, and size.
 
 Example:
 
@@ -194,7 +206,7 @@ The `gdata` object can contain various options to customize the appearance and b
 - The `dragDirection`, `dragIfCondition`, `runFunctionOnDragEnd`, and `runFunctionDuringDrag` options are only applicable when `draggability` is set to 'yes'.
 
 
-## Function: viewX.addLine <a id="addLine"></a>
+## Function: viewX.addLine
 
 ### Description
 This function adds a new line to the specified graph with the given name and line options. The line can be customized using various options provided in the `lineoptions` parameter.
@@ -238,52 +250,6 @@ The `lineoptions` object can contain various options to customize the appearance
 - `strokedasharray` (String): A string specifying the stroke-dasharray attribute for the line. Default: "" (solid line).
 - `strokewidth` (Number): The width of the line stroke. Default: 1.
 - `linecolor` (String): The color of the line in CSS color format. Default: 'hsla(190, 100%, 50%, 1)'.
-
-## Function: viewX.updateLine
-
-### Description
-This function updates the specified line in the specified graph with the new line values provided in the `linevalues` parameter.
-
-### Syntax
-```javascript
-viewX.updateLine(graphname, linename, linevalues);
-```
-
-### Parameters
-- `graphname` (String): The name of the graph containing the line to be updated.
-- `linename` (String): The name of the line to be updated.
-- `linevalues` (Object): An object containing the new line values to be applied.
-
-### Return Value
-This function does not return a value.
-
-### Example
-```javascript
-var graphName = "myGraph";
-var lineName = "myLine";
-var updatedLineValues = {
-  x1: 1,
-  y1: 1,
-  x2: 6,
-  y2: 6,
-  strokedasharray: "10,10",
-  strokewidth: 3,
-  linecolor: "hsla(200, 100%, 50%, 1)"
-};
-viewX.updateLine(graphName, lineName, updatedLineValues);
-```
-
-### Updated Line Values
-The `linevalues` object can contain new values for the line to be updated. The following options are available:
-
-- `x1` (Number): The new x-coordinate of the starting point of the line.
-- `y1` (Number): The new y-coordinate of the starting point of the line.
-- `x2` (Number): The new x-coordinate of the ending point of the line.
-- `y2` (Number): The new y-coordinate of the ending point of the line.
-- `strokedasharray` (String): A string specifying the new stroke-dasharray attribute for the line.
-- `strokewidth` (Number): The new width of the line stroke.
-- `linecolor` (String): The new color of the line in CSS color format.
-
 
 ## Function: viewX.addPath
 
@@ -401,51 +367,7 @@ viewX.updateArrow(graphName, arrowName, newArrowOptions);
 ### Notes
 - The `newarrowoptions` object can contain any of the arrow options available in the `viewX.addArrow` function.
 
-## Function: viewX.updatePath
 
-### Description
-This function updates an existing path in the specified graph with new path options. The function modifies the path element and path options in the graph data.
-
-### Syntax
-```javascript
-viewX.updatePath(graphname, pathname, newpathoptions);
-```
-
-### Parameters
-- `graphname` (String): The name of the graph containing the path to be updated.
-- `pathname` (String): The name of the path to be updated.
-- `newpathoptions` (Object): An object containing the new path options to be applied to the path.
-
-### Example
-```javascript
-var graphName = "myGraph";
-var pathName = "myPath";
-var newPathOptions = {
-  points: [[0, 1], [1, 0], [2, 2]],
-  strokewidth: 1,
-  pathcolor: "hsla(190, 100%, 50%, 1)",
-  pathfillcolor: "none"
-};
-viewX.updatePath(graphName, pathName, newPathOptions);
-```
-
-### Notes
-- The `newpathoptions` object can contain any of the path options available in the `viewX.addPath` function.
-
-## Function: viewX.updatePathPoints
-
-### Description
-This function updates the points of an existing path in the specified graph. The function modifies the path element and path options in the graph data.
-
-### Syntax
-```javascript
-viewX.updatePathPoints(graphname, pathname, npathpoints);
-```
-
-### Parameters
-- `graphname` (String): The name of the graph containing the path to be updated.
-- `pathname` (String): The name of the path to be updated.
-- `npathpoints` (Array of Arrays): An array of coordinate pairs representing the new points
 
 ## Function: viewX.addCircle
 
@@ -480,35 +402,6 @@ var circleOptions = {
 viewX.addCircle(graphName, circleName, circleOptions);
 ```
 
-## Function: viewX.updateCircle
-
-### Description
-This function updates the appearance and position of the circle with the specified name in the specified graph. The circle appearance can be customized using various options provided in the `circlenewvalues` parameter.
-
-### Syntax
-```javascript
-viewX.updateCircle(graphname, circlename, circlenewvalues);
-```
-
-### Parameters
-- `graphname` (String): The name of the graph to which the circle belongs.
-- `circlename` (String): The unique name assigned to the circle. It is used as the identifier for the circle in the library.
-- `circlenewvalues` (Object): An object containing the new values for the circle options.
-
-### Example
-```javascript
-var graphName = "myGraph";
-var circleName = "myCircle";
-var circleNewValues = {
-  x: 4,
-  y: 5,
-  radius: 2,
-  stroke: 'hsla(190, 100%, 50%, 0.7)',
-  strokewidth: 0.15,
-  circlecolor: 'hsla(190, 100%, 50%, 0.8)'
-};
-viewX.updateCircle(graphName, circleName, circleNewValues);
-```
 
 ## Function: viewX.addEllipse
 
@@ -542,37 +435,6 @@ var ellipseOptions = {
   ellipsecolor: 'hsla(190, 100%, 50%, 1)'
 };
 viewX.addEllipse(graphName, ellipseName, ellipseOptions);
-```
-
-## Function: viewX.updateEllipse
-
-### Description
-This function updates the appearance and position of the ellipse with the specified name in the specified graph. The ellipse appearance can be customized using various options provided in the `ellipsenewvalues` parameter.
-
-### Syntax
-```javascript
-viewX.updateEllipse(graphname, ellipsename, ellipsenewvalues);
-```
-
-### Parameters
-- `graphname` (String): The name of the graph to which the ellipse belongs.
-- `ellipsename` (String): The unique name assigned to the ellipse. It is used as the identifier for the ellipse in the library.
-- `ellipsenewvalues` (Object): An object containing the new values for the ellipse options.
-
-### Example
-```javascript
-var graphName = "myGraph";
-var ellipseName = "myEllipse";
-var ellipseNewValues = {
-  x: 4,
-  y: 5,
-  rx: 2,
-  ry: 3,
-  stroke: 'hsla(190, 100%, 50%, 0.7)',
-  strokewidth: 0.15,
-  ellipsecolor: 'hsla(190, 100%, 50%, 0.8)'
-};
-viewX.updateEllipse(graphName, ellipseName, ellipseNewValues);
 ```
 
 
@@ -626,36 +488,7 @@ The `textoptions` object can contain various options to customize the appearance
 - The `x` and `y` coordinates are specified in graph coordinates, not pixel coordinates.
 - The text element is added as an SVG element to the graph, allowing it to scale with the graph dimensions.
 
-## Function: viewX.updateText
 
-### Description
-This function updates an existing text element on the specified graph with the given name and text values. The text element can be updated using various options provided in the `textvalues` parameter.
-
-### Syntax
-```javascript
-viewX.updateText(graphname, textname, textvalues);
-```
-
-### Parameters
-- `graphname` (String): The name of the graph containing the text element to be updated.
-- `textname` (String): The unique name assigned to the text element. It is used as the identifier for the text element in the library.
-- `textvalues` (Object): An object containing the updated text values and various customization options for the text element appearance and behavior.
-
-### Return Value
-This function returns an array containing the updated text element and the text options (modified with the applied customizations).
-
-### Example
-```javascript
-var graphName = "myGraph";
-var textName = "myText";
-var newTextValues = {
-  x: 7,
-  y: 7,
-  text: "Updated text!",
-  textcolor: "hsla(190, 100%, 50%, 1)"
-};
-viewX.updateText(graphName, textName, newTextValues);
-```
 
 ## Function: viewX.addRectangle
 
@@ -707,43 +540,6 @@ The `rectoptions` object can contain various options to customize the appearance
 - The `x`, `y`, `w`, and `h` values are specified in graph coordinates, not pixel coordinates.
 - The rectangle element is added as an SVG element to the graph, allowing it to scale with the graph dimensions.
 
-## Function: viewX.updateRectangle
-
-### Description
-This function updates an existing rectangle element on the specified graph with the given name and rectangle value updates. The rectangle element can be updated using various options provided in the `rectvalueupdate` parameter.
-
-### Syntax
-```javascript
-viewX.updateRectangle(graphname, rectname, rectvalueupdate);
-```
-
-### Parameters
-- `graphname` (String): The name of the graph containing the rectangle element to be updated.
-- `rectname` (String): The unique name assigned to the rectangle element. It is used as the identifier for the rectangle element in the library.
-- `rectvalueupdate` (Object): An object containing the updated rectangle values and various customization options for the rectangle element appearance and behavior.
-
-### Return Value
-This function returns an array containing the updated rectangle element and the rectangle options (modified with the applied customizations).
-
-### Example
-```javascript
-var graphName = "myGraph";
-var rectName = "myRectangle";
-var newRectValues = {
-  x: 3,
-  y: 3,
-  w: 5,
-  h: 4,
-  stroke: "hsla(190, 100%, 70%, 0.5)",
-  strokewidth: 0.2,
-  rectcolor: "hsla(190, 100%, 70%, 1)"
-};
-viewX.updateRectangle(graphName, rectName, newRectValues);
-```
-
-### Notes
-- The `x`, `y`, `w`, and `h` values can be updated independently, allowing for flexible customization of the rectangle element.
-- The rectangle element is updated as an SVG element on the graph, allowing it to scale with the graph dimensions.
 
 
 ## Function: viewX.addPoint
@@ -796,6 +592,276 @@ The `pointoptions` object can contain various options to customize the appearanc
 - The `draggability` option can be set to 'yes' to enable dragging for the point. The `currentlyDraggable` option determines whether the point is draggable at the moment.
 - The `dragDirection` option can be set to 'xOnly' or 'yOnly' to restrict the dragging to only one axis.
 - The `dragIfCondition` option can be set to a custom condition to allow dragging only when the condition is met.
+
+
+
+## Function: viewX.makeArc
+
+### Description
+This function creates an arc with the specified parameters and adds it to the graph with the given `ringname`. The function returns an array of points representing the arc.
+
+### Syntax
+```javascript
+viewX.makeArc(arcradius, arcthickness, arccolor, startanglepercent, endanglepercent, ringname);
+```
+
+### Parameters
+- `arcradius` (Number): The radius of the arc.
+- `arcthickness` (Number): The thickness of the arc.
+- `arccolor` (String): The color of the arc (e.g., `"red"` or `"#FF0000"`).
+- `startanglepercent` (Number): The starting angle of the arc as a percentage of 360 degrees (e.g., `0.25` for 90 degrees).
+- `endanglepercent` (Number): The ending angle of the arc as a percentage of 360 degrees (e.g., `0.5` for 180 degrees).
+- `ringname` (String): The name of the graph to which the arc will be added.
+
+### Return Value
+This function returns an array of points representing the arc.
+
+### Example
+```javascript
+var arcRadius = 5;
+var arcThickness = 2;
+var arcColor = "red";
+var startAnglePercent = 0;
+var endAnglePercent = 0.5;
+var ringName = "myGraph";
+viewX.makeArc(arcRadius, arcThickness, arcColor, startAnglePercent, endAnglePercent, ringName);
+```
+
+
+
+
+
+
+
+
+
+
+
+## Function: viewX.updateLine
+
+### Description
+This function updates the specified line in the specified graph with the new line values provided in the `linevalues` parameter.
+
+### Syntax
+```javascript
+viewX.updateLine(graphname, linename, linevalues);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the line to be updated.
+- `linename` (String): The name of the line to be updated.
+- `linevalues` (Object): An object containing the new line values to be applied.
+
+### Return Value
+This function does not return a value.
+
+### Example
+```javascript
+var graphName = "myGraph";
+var lineName = "myLine";
+var updatedLineValues = {
+  x1: 1,
+  y1: 1,
+  x2: 6,
+  y2: 6,
+  strokedasharray: "10,10",
+  strokewidth: 3,
+  linecolor: "hsla(200, 100%, 50%, 1)"
+};
+viewX.updateLine(graphName, lineName, updatedLineValues);
+```
+
+### Updated Line Values
+The `linevalues` object can contain new values for the line to be updated. The following options are available:
+
+- `x1` (Number): The new x-coordinate of the starting point of the line.
+- `y1` (Number): The new y-coordinate of the starting point of the line.
+- `x2` (Number): The new x-coordinate of the ending point of the line.
+- `y2` (Number): The new y-coordinate of the ending point of the line.
+- `strokedasharray` (String): A string specifying the new stroke-dasharray attribute for the line.
+- `strokewidth` (Number): The new width of the line stroke.
+- `linecolor` (String): The new color of the line in CSS color format.
+
+
+
+## Function: viewX.updatePath
+
+### Description
+This function updates an existing path in the specified graph with new path options. The function modifies the path element and path options in the graph data.
+
+### Syntax
+```javascript
+viewX.updatePath(graphname, pathname, newpathoptions);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the path to be updated.
+- `pathname` (String): The name of the path to be updated.
+- `newpathoptions` (Object): An object containing the new path options to be applied to the path.
+
+### Example
+```javascript
+var graphName = "myGraph";
+var pathName = "myPath";
+var newPathOptions = {
+  points: [[0, 1], [1, 0], [2, 2]],
+  strokewidth: 1,
+  pathcolor: "hsla(190, 100%, 50%, 1)",
+  pathfillcolor: "none"
+};
+viewX.updatePath(graphName, pathName, newPathOptions);
+```
+
+### Notes
+- The `newpathoptions` object can contain any of the path options available in the `viewX.addPath` function.
+
+## Function: viewX.updatePathPoints
+
+### Description
+This function updates the points of an existing path in the specified graph. The function modifies the path element and path options in the graph data.
+
+### Syntax
+```javascript
+viewX.updatePathPoints(graphname, pathname, npathpoints);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the path to be updated.
+- `pathname` (String): The name of the path to be updated.
+- `npathpoints` (Array of Arrays): An array of coordinate pairs representing the new points
+
+## Function: viewX.updateCircle
+
+### Description
+This function updates the appearance and position of the circle with the specified name in the specified graph. The circle appearance can be customized using various options provided in the `circlenewvalues` parameter.
+
+### Syntax
+```javascript
+viewX.updateCircle(graphname, circlename, circlenewvalues);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph to which the circle belongs.
+- `circlename` (String): The unique name assigned to the circle. It is used as the identifier for the circle in the library.
+- `circlenewvalues` (Object): An object containing the new values for the circle options.
+
+### Example
+```javascript
+var graphName = "myGraph";
+var circleName = "myCircle";
+var circleNewValues = {
+  x: 4,
+  y: 5,
+  radius: 2,
+  stroke: 'hsla(190, 100%, 50%, 0.7)',
+  strokewidth: 0.15,
+  circlecolor: 'hsla(190, 100%, 50%, 0.8)'
+};
+viewX.updateCircle(graphName, circleName, circleNewValues);
+```
+
+
+## Function: viewX.updateEllipse
+
+### Description
+This function updates the appearance and position of the ellipse with the specified name in the specified graph. The ellipse appearance can be customized using various options provided in the `ellipsenewvalues` parameter.
+
+### Syntax
+```javascript
+viewX.updateEllipse(graphname, ellipsename, ellipsenewvalues);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph to which the ellipse belongs.
+- `ellipsename` (String): The unique name assigned to the ellipse. It is used as the identifier for the ellipse in the library.
+- `ellipsenewvalues` (Object): An object containing the new values for the ellipse options.
+
+### Example
+```javascript
+var graphName = "myGraph";
+var ellipseName = "myEllipse";
+var ellipseNewValues = {
+  x: 4,
+  y: 5,
+  rx: 2,
+  ry: 3,
+  stroke: 'hsla(190, 100%, 50%, 0.7)',
+  strokewidth: 0.15,
+  ellipsecolor: 'hsla(190, 100%, 50%, 0.8)'
+};
+viewX.updateEllipse(graphName, ellipseName, ellipseNewValues);
+```
+
+
+## Function: viewX.updateText
+
+### Description
+This function updates an existing text element on the specified graph with the given name and text values. The text element can be updated using various options provided in the `textvalues` parameter.
+
+### Syntax
+```javascript
+viewX.updateText(graphname, textname, textvalues);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the text element to be updated.
+- `textname` (String): The unique name assigned to the text element. It is used as the identifier for the text element in the library.
+- `textvalues` (Object): An object containing the updated text values and various customization options for the text element appearance and behavior.
+
+### Return Value
+This function returns an array containing the updated text element and the text options (modified with the applied customizations).
+
+### Example
+```javascript
+var graphName = "myGraph";
+var textName = "myText";
+var newTextValues = {
+  x: 7,
+  y: 7,
+  text: "Updated text!",
+  textcolor: "hsla(190, 100%, 50%, 1)"
+};
+viewX.updateText(graphName, textName, newTextValues);
+```
+
+## Function: viewX.updateRectangle
+
+### Description
+This function updates an existing rectangle element on the specified graph with the given name and rectangle value updates. The rectangle element can be updated using various options provided in the `rectvalueupdate` parameter.
+
+### Syntax
+```javascript
+viewX.updateRectangle(graphname, rectname, rectvalueupdate);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the rectangle element to be updated.
+- `rectname` (String): The unique name assigned to the rectangle element. It is used as the identifier for the rectangle element in the library.
+- `rectvalueupdate` (Object): An object containing the updated rectangle values and various customization options for the rectangle element appearance and behavior.
+
+### Return Value
+This function returns an array containing the updated rectangle element and the rectangle options (modified with the applied customizations).
+
+### Example
+```javascript
+var graphName = "myGraph";
+var rectName = "myRectangle";
+var newRectValues = {
+  x: 3,
+  y: 3,
+  w: 5,
+  h: 4,
+  stroke: "hsla(190, 100%, 70%, 0.5)",
+  strokewidth: 0.2,
+  rectcolor: "hsla(190, 100%, 70%, 1)"
+};
+viewX.updateRectangle(graphName, rectName, newRectValues);
+```
+
+### Notes
+- The `x`, `y`, `w`, and `h` values can be updated independently, allowing for flexible customization of the rectangle element.
+- The rectangle element is updated as an SVG element on the graph, allowing it to scale with the graph dimensions.
+
 
 ## Function: viewX.updatePoint
 
@@ -853,6 +919,22 @@ var newX = 8;
 var newY = 4;
 viewX.updatePointXY(graphName, pointName, newX, newY);
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Function: viewX.removePoint
 
@@ -996,37 +1078,6 @@ viewX.removeGraph(graphname);
 viewX.removeGraph("myGraph");
 ```
 
-## Function: viewX.makeArc
-
-### Description
-This function creates an arc with the specified parameters and adds it to the graph with the given `ringname`. The function returns an array of points representing the arc.
-
-### Syntax
-```javascript
-viewX.makeArc(arcradius, arcthickness, arccolor, startanglepercent, endanglepercent, ringname);
-```
-
-### Parameters
-- `arcradius` (Number): The radius of the arc.
-- `arcthickness` (Number): The thickness of the arc.
-- `arccolor` (String): The color of the arc (e.g., `"red"` or `"#FF0000"`).
-- `startanglepercent` (Number): The starting angle of the arc as a percentage of 360 degrees (e.g., `0.25` for 90 degrees).
-- `endanglepercent` (Number): The ending angle of the arc as a percentage of 360 degrees (e.g., `0.5` for 180 degrees).
-- `ringname` (String): The name of the graph to which the arc will be added.
-
-### Return Value
-This function returns an array of points representing the arc.
-
-### Example
-```javascript
-var arcRadius = 5;
-var arcThickness = 2;
-var arcColor = "red";
-var startAnglePercent = 0;
-var endAnglePercent = 0.5;
-var ringName = "myGraph";
-viewX.makeArc(arcRadius, arcThickness, arcColor, startAnglePercent, endAnglePercent, ringName);
-```
 
 ## Function: viewX.deleteSegments
 
