@@ -1,6 +1,21 @@
-# viewX Documentation
-
 ViewX JavaScript library contains a set of functions and utilities for creating interactive simulations and animations using HTML and JavaScript. The library allows you to create and manipulate graphical objects such as points, paths, circles, and lines on an interactive graph.
+
+### Basic Demo
+[Basic Demo](https://rawcdn.githack.com/prajwalsouza/viewX/f4ce5053fd1d4c1eb6835bd97109e8777da22e7f/template.html) with code at [viewX/template.html](https://github.com/prajwalsouza/viewX/blob/main/template.html)
+
+![Demo Image](https://github.com/prajwalsouza/viewX/blob/main/template.png)
+
+
+### Other examples
+[Complex Functions](https://prajwalsouza.github.io/Experiments/Complex-Functions.html)
+
+![Complex Functions](https://github.com/prajwalsouza/Complex-Functions/blob/master/Zeta-point05Resolution.PNG)
+
+[Simulating the Epidemic](https://prajwalsouza.github.io/Experiments/Epidemic-Simulation.html)
+
+![Epidemic Simulation](https://user-images.githubusercontent.com/25048805/161405553-4ba8a73f-d6e9-49f8-b7e5-a93351da2d2e.png)
+
+# viewX Documentation
 
 ### Main Features
 
@@ -21,12 +36,9 @@ ViewX JavaScript library contains a set of functions and utilities for creating 
 9. Point : [viewX.addPoint](#function-viewxaddpoint), [viewX.updatePoint](#function-viewxupdatepoint), [viewX.removePoint](#function-viewxremovepoint)
 10. Arc : [viewX.makeArc](#function-viewxmakearc)
 
-## Basic Demo
-[Basic Demo](https://rawcdn.githack.com/prajwalsouza/viewX/f4ce5053fd1d4c1eb6835bd97109e8777da22e7f/template.html) with code at [viewX/template.html](https://github.com/prajwalsouza/viewX/blob/main/template.html)
-
-### Demo Explained : 
 
 
+### Demo Explained
 #### Setting up the Graph
 
 Importing the library. 
