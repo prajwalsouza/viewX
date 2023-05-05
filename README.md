@@ -12,7 +12,7 @@ ViewX JavaScript library contains a set of functions and utilities for creating 
 ## Basic Demo
 ### Setting up the Graph
 
-To set up the graph, call the `setUpGraph()` function. This function creates a graph with the specified options, such as axis limits, gridlines visibility, and more. The graph is added to the specified HTML element.
+To set up the graph, call the `setUpGraph()` function. This function creates a graph with the specified options, such as axis limits, gridlines visibility, and more. The graph is added to the specified HTML element. Uses the viewX function [viewX.addGraph()](#function-viewxaddgraph).
 
 Example:
 
