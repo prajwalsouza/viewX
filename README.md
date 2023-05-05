@@ -1,8 +1,4 @@
 # viewX Documentation
-
-
-
-
 ## Function: viewX.addGraph
 
 ### Description
@@ -625,3 +621,546 @@ viewX.updateRectangle(graphName, rectName, newRectValues);
 ### Notes
 - The `x`, `y`, `w`, and `h` values can be updated independently, allowing for flexible customization of the rectangle element.
 - The rectangle element is updated as an SVG element on the graph, allowing it to scale with the graph dimensions.
+
+
+## Function: viewX.addPoint
+
+### Description
+This function adds a new point to the specified graph with the given point name and point options. The point can be customized using various options provided in the `pointoptions` parameter.
+
+### Syntax
+```javascript
+viewX.addPoint(graphname, pointname, pointoptions);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph in which the point will be added.
+- `pointname` (String): The unique name assigned to the point. It is used as the identifier for the point in the library.
+- `pointoptions` (Object): An object containing various customization options for the point appearance and behavior.
+
+### Return Value
+This function returns an array containing the point element (SVG Ellipse) and the point options (modified with the applied customizations).
+
+### Example
+```javascript
+var graphName = "myGraph";
+var pointName = "myPoint";
+var pointOptions = {
+  x: 2,
+  y: 3,
+  pointsize: 0.7,
+  pointcolor: 'hsla(190, 100%, 50%, 1)',
+  draggability: 'yes'
+};
+viewX.addPoint(graphName, pointName, pointOptions);
+```
+
+### Point Options
+The `pointoptions` object can contain various options to customize the appearance and behavior of the point. The following options are available:
+
+- `x` (Number): The x-coordinate of the point. Default: 0.3.
+- `y` (Number): The y-coordinate of the point. Default: 0.3.
+- `pointsize` (Number): The size of the point. Default: 0.7.
+- `pointcolor` (String): The color of the point. Default: 'hsla(190, 100%, 50%, 1)'.
+- `draggability` (String): Whether the point can be dragged ('yes' or 'no'). Default: 'no'.
+- `currentlyDraggable` (String): Whether the point is currently draggable ('yes' or 'no'). Default depends on the `draggability` option.
+- `runFunctionOnDragEnd` (String): The function to run when the point drag ends. Default: ''.
+- `runFunctionDuringDrag` (String): The function to run during the point drag. Default: ''.
+- `dragDirection` (String): The direction in which the point can be dragged ('bothXY', 'xOnly', or 'yOnly'). Default: 'bothXY'.
+- `dragIfCondition` (String): The condition for allowing the point to be dragged. Default: 'true'.
+
+### Notes
+- The `draggability` option can be set to 'yes' to enable dragging for the point. The `currentlyDraggable` option determines whether the point is draggable at the moment.
+- The `dragDirection` option can be set to 'xOnly' or 'yOnly' to restrict the dragging to only one axis.
+- The `dragIfCondition` option can be set to a custom condition to allow dragging only when the condition is met.
+
+## Function: viewX.updatePoint
+
+### Description
+This function updates the specified point in the graph with new point options.
+
+### Syntax
+```javascript
+viewX.updatePoint(graphname, pointname, newpointoptions);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the point.
+- `pointname` (String): The name of the point to be updated.
+- `newpointoptions` (Object): An object containing the new point options to be applied.
+
+### Example
+```javascript
+var graphName = "myGraph";
+var pointName = "myPoint";
+var newPointOptions = {
+  x: 5,
+  y: 7,
+  pointsize: 1,
+  pointcolor: 'hsla(250, 100%, 50%, 1)',
+  draggability: 'no'
+};
+viewX.updatePoint(graphName, pointName, newPointOptions);
+```
+
+### Notes
+- The `newpointoptions` object can contain any of the point options available in the `pointoptions` object of the `viewX.addPoint` function. Any options not provided will maintain their previous values.
+
+## Function: viewX.updatePointXY
+
+### Description
+This function updates the x and y coordinates of the specified point in the graph.
+
+### Syntax
+```javascript
+viewX.updatePointXY(graphname, pointname, xvalue, yvalue);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the point.
+- `pointname` (String): The name of the point to be updated.
+- `xvalue` (Number): The new x-coordinate of the point.
+- `yvalue` (Number): The new y-coordinate of the point.
+
+### Example
+```javascript
+var graphName = "myGraph";
+var pointName = "myPoint";
+var newX = 8;
+var newY = 4;
+viewX.updatePointXY(graphName, pointName, newX, newY);
+```
+
+## Function: viewX.removePoint
+
+### Description
+This function removes the specified point from the graph.
+
+### Syntax
+```javascript
+viewX.removePoint(graphname, pointname);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph containing the point.
+- `pointname` (String): The name of the point to be removed.
+
+### Example
+```javascript
+var graphName = "myGraph";
+var pointName = "myPoint";
+viewX.removePoint(graphName, pointName);
+```
+
+### Notes
+- After removing a point using this function, it cannot be restored. To add a new point, use the `viewX.addPoint` function.
+
+## Function: viewX.removeLine
+
+### Description
+This function removes a line from the specified graph by its name.
+
+### Syntax
+```javascript
+viewX.removeLine(graphname, linename);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph from which the line will be removed.
+- `linename` (String): The unique name of the line to remove from the graph.
+
+### Example
+```javascript
+viewX.removeLine("myGraph", "myLine");
+```
+
+## Function: viewX.removeCircle
+
+### Description
+This function removes a circle from the specified graph by its name.
+
+### Syntax
+```javascript
+viewX.removeCircle(graphname, circlename);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph from which the circle will be removed.
+- `circlename` (String): The unique name of the circle to remove from the graph.
+
+### Example
+```javascript
+viewX.removeCircle("myGraph", "myCircle");
+```
+
+## Function: viewX.removeText
+
+### Description
+This function removes a text element from the specified graph by its name.
+
+### Syntax
+```javascript
+viewX.removeText(graphname, textname);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph from which the text element will be removed.
+- `textname` (String): The unique name of the text element to remove from the graph.
+
+### Example
+```javascript
+viewX.removeText("myGraph", "myText");
+```
+
+## Function: viewX.removePath
+
+### Description
+This function removes a path from the specified graph by its name.
+
+### Syntax
+```javascript
+viewX.removePath(graphname, pathname);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph from which the path will be removed.
+- `pathname` (String): The unique name of the path to remove from the graph.
+
+### Example
+```javascript
+viewX.removePath("myGraph", "myPath");
+```
+
+## Function: viewX.removeArrow
+
+### Description
+This function removes an arrow from the specified graph by its name.
+
+### Syntax
+```javascript
+viewX.removeArrow(graphname, arrowname);
+```
+
+### Parameters
+- `graphname` (String): The name of the graph from which the arrow will be removed.
+- `arrowname` (String): The unique name of the arrow to remove from the graph.
+
+### Example
+```javascript
+viewX.removeArrow("myGraph", "myArrow");
+```
+
+### Notes
+- The specified element (line, circle, text, path, or arrow) will be removed from the graph by its unique name.
+- Removing an element that does not exist in the graph will not throw any errors, but it will have no effect.
+
+
+## Function: viewX.removeGraph
+
+### Description
+This function removes a graph with the specified `graphname` from the DOM and deletes its data from the `viewX.graphData` object.
+
+### Syntax
+```javascript
+viewX.removeGraph(graphname);
+```
+
+### Parameters
+- `graphname` (String): The unique name assigned to the graph that you want to remove.
+
+### Example
+```javascript
+viewX.removeGraph("myGraph");
+```
+
+## Function: viewX.makeArc
+
+### Description
+This function creates an arc with the specified parameters and adds it to the graph with the given `ringname`. The function returns an array of points representing the arc.
+
+### Syntax
+```javascript
+viewX.makeArc(arcradius, arcthickness, arccolor, startanglepercent, endanglepercent, ringname);
+```
+
+### Parameters
+- `arcradius` (Number): The radius of the arc.
+- `arcthickness` (Number): The thickness of the arc.
+- `arccolor` (String): The color of the arc (e.g., `"red"` or `"#FF0000"`).
+- `startanglepercent` (Number): The starting angle of the arc as a percentage of 360 degrees (e.g., `0.25` for 90 degrees).
+- `endanglepercent` (Number): The ending angle of the arc as a percentage of 360 degrees (e.g., `0.5` for 180 degrees).
+- `ringname` (String): The name of the graph to which the arc will be added.
+
+### Return Value
+This function returns an array of points representing the arc.
+
+### Example
+```javascript
+var arcRadius = 5;
+var arcThickness = 2;
+var arcColor = "red";
+var startAnglePercent = 0;
+var endAnglePercent = 0.5;
+var ringName = "myGraph";
+viewX.makeArc(arcRadius, arcThickness, arcColor, startAnglePercent, endAnglePercent, ringName);
+```
+
+## Function: viewX.deleteSegments
+
+### Description
+This function deletes a collection of SVG segments by setting their `outerHTML` to an empty string.
+
+### Syntax
+```javascript
+viewX.deleteSegments(collection);
+```
+
+### Parameters
+- `collection` (Array): An array of SVG elements to be deleted.
+
+### Example
+```javascript
+var segments = document.querySelectorAll(".segments-to-delete");
+viewX.deleteSegments(segments);
+```
+
+## Function: viewX.randomChoice
+
+### Description
+This function returns a random element from the given `choicearray`.
+
+### Syntax
+```javascript
+viewX.randomChoice(choicearray);
+```
+
+### Parameters
+- `choicearray` (Array): An array of elements from which a random choice will be made.
+
+### Return Value
+This function returns a random element from the `choicearray`.
+
+### Example
+```javascript
+var choices = ["apple", "banana", "cherry"];
+var randomFruit = viewX.randomChoice(choices);
+console.log(randomFruit); // Output: "apple" (or "banana" or "cherry")
+```
+
+## Function: viewX.randomWeightedChoice
+
+### Description
+This function returns a random element from the given `choicearray` based on the weights provided in the `weightArray`.
+
+### Syntax
+```javascript
+viewX.randomWeightedChoice(choicearray, weightArray);
+```
+
+### Parameters
+- `choicearray` (Array): An array of elements from which a random choice will be made.
+- `weightArray` (Array): An array of weights corresponding to the elements in the `choicearray`.
+
+### Return Value
+This function returns a random element from the `choicearray` based on the weights provided in the `weightArray`.
+
+### Example
+```javascript
+var choices = ["apple", "banana", "cherry"];
+var weights = [1, 2, 1];
+var randomFruit = viewX.randomWeightedChoice(choices, weights);
+console.log(randomFruit); // Output: "banana" (or "apple" or "cherry" with the specified weights)
+```
+
+## Function: viewX.linearValue
+
+### Description
+This function calculates the linear interpolation between two points `(xv1, yv1)` and `(xv2, yv2)` for a given input value `inputvl`.
+
+### Syntax
+```javascript
+viewX.linearValue(xv1, xv2, yv1, yv2, inputvl);
+```
+
+### Parameters
+- `xv1` (Number): The x-coordinate of the first point.
+- `xv2` (Number): The x-coordinate of the second point.
+- `yv1` (Number): The y-coordinate of the first point.
+- `yv2` (Number): The y-coordinate of the second point.
+- `inputvl` (Number): The input value for which the interpolated value should be calculated.
+
+### Return Value
+This function returns the interpolated value for the given input value `inputvl`.
+
+### Example
+```javascript
+var result = viewX.linearValue(0, 10, 0, 100, 5);
+console.log(result); // Output: 50
+```
+
+## Function: viewX.setFont
+
+### Description
+This function sets the font size of a collection of HTML elements with the specified `fontval`.
+
+### Syntax
+```javascript
+viewX.setFont(divCollection, fontval);
+```
+
+### Parameters
+- `divCollection` (Array): An array of element IDs for which the font size should be set.
+- `fontval` (String): The font size value to be set (e.g., `"16px"` or `"1.5em"`).
+
+### Example
+```javascript
+var elements = ["element1", "element2", "element3"];
+var fontSize = "18px";
+viewX.setFont(elements, fontSize);
+```
+
+## Function: viewX.distF
+
+### Description
+This function calculates the Euclidean distance between two points `pt1` and `pt2`.
+
+### Syntax
+```javascript
+viewX.distF(pt1, pt2);
+```
+
+### Parameters
+- `pt1` (Array): An array of two numbers representing the x and y coordinates of the first point.
+- `pt2` (Array): An array of two numbers representing the x and y coordinates of the second point.
+
+### Return Value
+This function returns the Euclidean distance between the two points.
+
+### Example
+```javascript
+var point1 = [0, 0];
+var point2 = [3, 4];
+var distance = viewX.distF(point1, point2);
+console.log(distance); // Output: 5
+```
+
+## Function: viewX.addVec
+
+### Description
+This function calculates the sum of two vectors `pt1` and `pt2`.
+
+### Syntax
+```javascript
+viewX.addVec(pt1, pt2);
+```
+
+### Parameters
+- `pt1` (Array): An array of two numbers representing the x and y components of the first vector.
+- `pt2` (Array): An array of two numbers representing the x and y components of the second vector.
+
+### Return Value
+This function returns an array representing the sum of the two input vectors.
+
+### Example
+```javascript
+var vector1 = [1, 2];
+var vector2 = [3, 4];
+var sum = viewX.addVec(vector1, vector2);
+console.log(sum); // Output: [4, 6]
+```
+
+## Function: viewX.directionVec
+
+### Description
+This function calculates the unit direction vector from point `pt1` to point `pt2`.
+
+### Syntax
+```javascript
+viewX.directionVec(pt1, pt2);
+```
+
+### Parameters
+- `pt1` (Array): An array of two numbers representing the x and y coordinates of the first point.
+- `pt2` (Array): An array of two numbers representing the x and y coordinates of the second point.
+
+### Return Value
+This function returns an array representing the unit direction vector from `pt1` to `pt2`.
+
+### Example
+```javascript
+var point1 = [0, 0];
+var point2 = [3, 4];
+var direction = viewX.directionVec(point1, point2);
+console.log(direction); // Output: [0.6, 0.8]
+```
+
+## Function: viewX.rotatedVec
+
+### Description
+This function calculates the vector obtained by rotating the input vector `ofVector` by the specified angle (in degrees).
+
+### Syntax
+```javascript
+viewX.rotatedVec(ofVector, angle);
+```
+
+### Parameters
+- `ofVector` (Array): An array of two numbers representing the x and y components of the input vector.
+- `angle` (Number): The angle in degrees by which the vector should be rotated.
+
+### Return Value
+This function returns an array representing the rotated vector.
+
+### Example
+```javascript
+var vector = [1, 0];
+var angle = 90;
+var rotated = viewX.rotatedVec(vector, angle);
+console.log(rotated); // Output: [0, 1]
+```
+
+## Function: viewX.mod
+
+### Description
+This function calculates the magnitude (or modulus) of the input vector `ofVector`.
+
+### Syntax
+```javascript
+viewX.mod(ofVector);
+```
+
+### Parameters
+- `ofVector` (Array): An array of two numbers representing the x and y components of the input vector.
+
+### Return Value
+This function returns the magnitude of the input vector.
+
+### Example
+```javascript
+var vector = [3, 4];
+var magnitude = viewX.mod(vector);
+console.log(magnitude); // Output: 5
+```
+
+## Function: viewX.shuffle
+
+### Description
+This function shuffles the elements of an input array `array` using the Fisher-Yates algorithm.
+
+### Syntax
+```javascript
+viewX.shuffle(array);
+```
+
+### Parameters
+- `array` (Array): An array of elements to be shuffled.
+
+### Return Value
+This function returns the shuffled array.
+
+### Example
+```javascript
+var numbers = [1, 2, 3, 4, 5];
+var shuffled = viewX.shuffle(numbers);
+console.log(shuffled); // Output: [3, 1, 5, 4, 2] (or any other random permutation)
+```
