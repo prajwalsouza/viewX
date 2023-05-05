@@ -1,4 +1,127 @@
 # viewX Documentation
+
+ViewX JavaScript library contains a set of functions and utilities for creating interactive simulations and animations using HTML and JavaScript. The library allows you to create and manipulate graphical objects such as points, paths, circles, and lines on an interactive graph.
+
+### Main Features
+
+1. Interactive graph with zoom and drag capabilities.
+2. Create and manipulate graphical objects such as points, paths, circles, and lines.
+3. Customize the appearance of the graph and its elements, including colors, stroke width, and more.
+4. Control the animation and calculation loop for the simulations.
+
+## Basic Demo
+### Setting up the Graph
+
+To set up the graph, call the `setUpGraph()` function. This function creates a graph with the specified options, such as axis limits, gridlines visibility, and more. The graph is added to the specified HTML element.
+
+Example:
+
+```javascript
+function setUpGraph() {
+    graphH = document.getElementById('graphHolderH');
+    graphoptions = {
+        xmax: 10,
+        xmin: -10,
+        ymax: 10,
+        ymin: -10,
+        axislocationX: 0,
+        axislocationY: 0,
+        xaxislabelvisibility: 'no',
+        yaxislabelvisibility: 'no',
+        fontSize: 1.6,
+        unitAspectRatio: 'yes',
+        fixAxisStretchCentrally: 'yes',
+        scrollZoom: 'yes',
+        draggability: 'yes'
+    };
+    viewX.addGraph(graphH, 'graphName', graphoptions)
+}
+setUpGraph()
+```
+
+### Adding Objects to the Graph
+
+To add objects to the graph, use the corresponding `add*` functions such as [addPoint](#222), [addPath](#addLine-), `addCircle`, and `addLine`. These functions take the graph's name and options for the object, such as its position, color, and size.
+
+Example:
+
+```javascript
+function addObjects() {
+    // Adding a point
+    options = {
+        x: 5,
+        y: 5,
+        pointcolor: 'hsla(40, 100%, 50%, 1)',
+        pointsize: 1
+    };
+    viewX.addPoint('graphName', 'samplePoint', options);
+
+    // Adding a path
+    options = {
+        points: [[4, 0], [0, 4], [-4, 0], [0, -4], [4, 0]],
+        pathcolor: 'hsla(190, 100%, 50%, 1)',
+        strokewidth: 0.3
+    };
+    viewX.addPath('graphName', 'samplePath', options);
+
+    // Adding a circle
+    options = {
+        x: 3,
+        y: 6,
+        radius: 2,
+        circlecolor: 'hsla(80, 100%, 50%, 0.4)',
+        stroke: 'hsla(100, 100%, 50%, 1)',
+        strokewidth: 1
+    };
+    viewX.addCircle('graphName', 'sampleCircle', options);
+
+    // Adding a line
+    options = {
+        x1: 1,
+        y1: 1,
+        x2: 3,
+        y2: 2,
+        linecolor: 'hsla(280, 100%, 50%, 0.4)',
+        strokewidth: 3
+    };
+    viewX.addLine('graphName', 'sampleLine', options);
+}
+addObjects()
+```
+
+### Animating Objects
+
+To animate objects in the graph, update their properties inside the `plotObjects` function. This function is called repeatedly inside the animation loop. You can update the position, color, and other properties of the objects using the `update*` functions, such as `updatePointXY`, `updateCircle`, etc.
+
+Example:
+
+```javascript
+function plotObjects() {
+    // Update point position
+    toMovePointX = 3 * Math.cos(animLoopCount * 0.01);
+    toMovePointY = 3 * Math.sin(animLoopCount * 0.01);
+    viewX.updatePointXY('graphName', 'samplePoint', toMovePointX, toMovePointY);
+
+    // Update circle radius and color
+    newRadius = 2 + Math.cos(animLoopCount * 0.01);
+    newColor = 'hsla(' + animLoopCount / 2 + ', 100%, 50%, 0.4)';
+    options = {
+        radius: newRadius,
+        circlecolor: newColor
+    };
+    viewX.updateCircle('graphName', 'sampleCircle', options);
+}
+```
+
+### Starting the Animation Loop
+
+To start the animation loop, call the `playAnimationLoop()` function. This function sets up a loop that calls the `plotObjects` function at the specified frame rate.
+
+```javascript
+playAnimationLoop()
+```
+
+# ViewX Functions
 ## Function: viewX.addGraph
 
 ### Description
@@ -71,7 +194,7 @@ The `gdata` object can contain various options to customize the appearance and b
 - The `dragDirection`, `dragIfCondition`, `runFunctionOnDragEnd`, and `runFunctionDuringDrag` options are only applicable when `draggability` is set to 'yes'.
 
 
-## Function: viewX.addLine
+## Function: viewX.addLine <a name="addLine"></a>
 
 ### Description
 This function adds a new line to the specified graph with the given name and line options. The line can be customized using various options provided in the `lineoptions` parameter.
