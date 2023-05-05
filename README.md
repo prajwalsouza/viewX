@@ -22,7 +22,17 @@ ViewX JavaScript library contains a set of functions and utilities for creating 
 10. Arc : [viewX.makeArc](#function-viewxmakearc)
 
 ## Basic Demo
-### Setting up the Graph
+[Basic Demo](https://rawcdn.githack.com/prajwalsouza/viewX/f4ce5053fd1d4c1eb6835bd97109e8777da22e7f/template.html) with code at [viewX/template.html](https://github.com/prajwalsouza/viewX/blob/main/template.html)
+
+### Demo Explained : 
+
+
+#### Setting up the Graph
+
+Importing the library. 
+```html
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/prajwalsouza/viewX/viewx.js"></script>
+```
 
 To set up the graph, call the `setUpGraph()` function. This function creates a graph with the specified options, such as axis limits, gridlines visibility, and more. The graph is added to the specified HTML element. Uses the viewX function [viewX.addGraph()](#function-viewxaddgraph).
 
@@ -51,7 +61,7 @@ function setUpGraph() {
 setUpGraph()
 ```
 
-### Adding Objects to the Graph
+#### Adding Objects to the Graph
 
 To add objects to the graph, use the corresponding `add*` functions such as [addPoint](#function-viewxaddpoint), [addPath](#function-viewxaddpath), [addCircle](#function-viewxaddcircle), and [addLine](#function-viewxaddline). These functions take the graph's name and options for the object, such as its position, color, and size.
 
@@ -101,7 +111,7 @@ function addObjects() {
 addObjects()
 ```
 
-### Animating Objects
+#### Animating Objects
 
 To animate objects in the graph, update their properties inside the `plotObjects` function. This function is called repeatedly inside the animation loop. You can update the position, color, and other properties of the objects using the `update*` functions, such as `updatePointXY`, `updateCircle`, etc.
 
@@ -125,11 +135,22 @@ function plotObjects() {
 }
 ```
 
-### Starting the Animation Loop
+#### Starting the Animation Loop
 
 To start the animation loop, call the `playAnimationLoop()` function. This function sets up a loop that calls the `plotObjects` function at the specified frame rate.
 
 ```javascript
+
+function playAnimationLoop(event) {
+    loopinterval = setInterval(frame, frameInterval);
+    function frame() {
+        animLoopCount = animLoopCount + 1
+        if (playing) {
+            plotObjects()
+        }
+    }
+}
+
 playAnimationLoop()
 ```
 
