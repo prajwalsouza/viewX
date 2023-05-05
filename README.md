@@ -194,7 +194,7 @@ The `gdata` object can contain various options to customize the appearance and b
 - The `dragDirection`, `dragIfCondition`, `runFunctionOnDragEnd`, and `runFunctionDuringDrag` options are only applicable when `draggability` is set to 'yes'.
 
 
-## Function: viewX.addLine <a name="addLine"></a>
+## Function: viewX.addLine <a id="addLine"></a>
 
 ### Description
 This function adds a new line to the specified graph with the given name and line options. The line can be customized using various options provided in the `lineoptions` parameter.
