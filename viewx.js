@@ -1165,9 +1165,9 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 		svgElement.addEventListener('mousedown', viewX.graphDragHandle)
 		svgElement.addEventListener('touchstart', viewX.graphDragHandle)
 	}
-	else {
-		svgElement.addEventListener('touchmove', viewX.graphTouchDisable)
-	}
+	// else {
+	// 	svgElement.addEventListener('touchmove', viewX.graphTouchDisable)
+	// }
 
 	if (gdata.draggability != 'yes' && gdata.scrollZoom != 'yes') {
 		svgElement.style.pointerEvents = 'none'
