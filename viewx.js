@@ -2382,6 +2382,29 @@ viewX.pointMoveEvent = function(event) {
 	}
 }
 
+viewX.svgPTVariableForGettingCoordinates = {}
+viewX.getCoordinatesOfEvent = function(gphname, event) {
+	event.preventDefault()
+	var rect = document.getElementById(gphname).getBoundingClientRect();
+	posx = event.clientX - rect.left;
+	posy = event.clientY - rect.top;
+	viewX.svgPTVariableForGettingCoordinates[gphname].x = event.clientX;
+	viewX.svgPTVariableForGettingCoordinates[gphname].y = event.clientY;
+
+	if (event.clientX == undefined) {
+		posx = event.changedTouches[0].clientX - rect.left;
+		posy = event.changedTouches[0].clientY - rect.top;
+		viewX.svgPTVariableForGettingCoordinates[gphname].x = event.changedTouches[0].clientX;
+		viewX.svgPTVariableForGettingCoordinates[gphname].y = event.changedTouches[0].clientY;
+	}
+
+	var cursorpt =  viewX.svgPTVariableForGettingCoordinates[gphname].matrixTransform(document.getElementById(gphname).getScreenCTM().inverse());
+
+	coordinatesX = viewX.svgToGraphX(cursorpt.x, viewX.graphData[gphname].xmin,viewX.graphData[gphname].xmax, viewX.graphData[gphname].aspectratio)
+	coordinatesY = viewX.svgToGraphY(cursorpt.y, viewX.graphData[gphname].ymin,viewX.graphData[gphname].ymax, viewX.graphData[gphname].aspectratio)
+	return [coordinatesX, coordinatesY]
+}
+
 viewX.pointUpEvent = function(event) {
 	gphname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][0]
 	ptname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][1]
