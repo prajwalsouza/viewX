@@ -1194,7 +1194,22 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 	return JSON.parse(JSON.stringify(gdata));
 }
 
+viewX.updateGraph = function (name, gdata_parametersToUpdate) {
 
+	for (var key in gdata_parametersToUpdate) {
+		viewX.graphData[name][key] = gdata_parametersToUpdate[key]
+	}
+
+	newZoom = {
+		xmin : viewX.graphData[name].xmin,
+		xmax : viewX.graphData[name].xmax,
+		ymin : viewX.graphData[name].ymin,
+		ymax : viewX.graphData[name].ymax
+	}
+	viewX.updateGraphZoom(name, newZoom)
+	
+	return viewX.graphData[name];
+}
 
 viewX.getGraphCursorLocation = function (cursorpercent, graphname) {
 	gdata = viewX.graphData[graphname]
