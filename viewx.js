@@ -1,5 +1,737 @@
 viewX = {}
 
+
+viewX.libraryFunctions = {}
+
+
+viewX.randomChoice = function(choicearray) {
+	return choicearray[parseInt(Math.random()*choicearray.length)]
+}
+
+viewX.randomWeightedChoice = function(choicearray, weightArray) {
+	if (choicearray.length == weightArray.length) {
+		weightSumA = weightArray.reduce(function(a, b) { return a + b; }, 0);
+		weightvalueChosen = Math.random()*weightSumA
+		weightSumZ = 0
+		for (weightIndex = 0; weightIndex < weightArray.length; weightIndex++) {
+			weightSumZ = weightSumZ + weightArray[weightIndex]
+			if (weightSumZ >= weightvalueChosen) {
+				indexchosenW = weightIndex
+				break
+			}
+		}
+		return choicearray[indexchosenW]
+	}
+		
+}
+
+viewX.linearValue = function(xv1, xv2, yv1, yv2, inputvl) {
+	return yv1 + ((inputvl - xv1)/(xv2 - xv1))*(yv2 - yv1)
+}
+
+viewX.linearValueLog = function(xv1, xv2, yv1, yv2, inputvl) {
+	return yv1 + ((Math.log(inputvl) - Math.log(xv1))/(Math.log(xv2) - Math.log(xv1)))*(yv2 - yv1)
+}
+
+
+
+viewX.setFont = function(divCollection, fontval) {
+	for (divN = 0; divN < divCollection.length; divN++) {
+		document.getElementById(divCollection[divN]).style.fontSize = fontval
+	}
+}
+
+viewX.distF = function(pt1, pt2) {
+	return Math.pow(Math.pow(pt1[0] - pt2[0], 2) + Math.pow(pt1[1] - pt2[1], 2), 0.5)
+}
+
+viewX.distF3D = function(pt1, pt2) {
+	return Math.pow(Math.pow(pt1[0] - pt2[0], 2) + Math.pow(pt1[1] - pt2[1], 2) + Math.pow(pt1[2] - pt2[2], 2), 0.5)
+}
+
+viewX.mod3D = function(ofVector) {
+	return viewX.distF3D(ofVector, [0,0,0])
+}
+
+
+viewX.addVec = function(pt1, pt2) {
+	if (typeof(pt2[0]) == 'number') {
+		return [pt1[0] + pt2[0], pt1[1] + pt2[1]]
+	}
+	else if (typeof(pt2[0]) == 'object') {
+		pts = []
+		for (var i = 0; i < pt2.length; i++) {
+			pts.push(viewX.addVec(pt1, pt2[i]))
+		}
+		return pts
+
+	} 
+}
+
+viewX.addVec3D = function(pt1, pt2) {
+	return [pt1[0] + pt2[0], pt1[1] + pt2[1], pt1[2] + pt2[2]]
+}
+
+viewX.dotProduct = function(v1, v2) {
+	if (v1.length == v2.length) {
+		sum = 0
+		for (var i = 0; i < v1.length; i++) {
+			sum = sum + v1[i]*v2[i]
+		}
+		return sum
+	}
+	else {
+		console.log("Vector dimensions do not match")
+	}
+		
+}
+
+viewX.crossProduct = function(v1, v2) {
+	if (v1.length == 3 && v2.length == 3) {
+		return [v1[1]*v2[2] - v1[2]*v2[1], v1[2]*v2[0] - v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]]
+	}
+	else {
+		console.log("Vector dimensions do not match")
+	}
+}
+
+viewX.scalarMultiplyVec = function(c, pt1) {
+	return [c*pt1[0], c*pt1[1]]
+}
+
+viewX.scalarMultiplyVec3D = function(c, pt1) {
+	return [c*pt1[0], c*pt1[1], c*pt1[2]]
+}
+
+viewX.subtractVec = function(pt1, pt2) {
+	return [pt1[0] - pt2[0], pt1[1] - pt2[1]]
+}
+
+viewX.subtractVec3D = function(pt1, pt2) {
+	return [pt1[0] - pt2[0], pt1[1] - pt2[1], pt1[2] - pt2[2]]
+}
+
+viewX.directionVec = function(pt1, pt2) {
+	diff = [pt2[0] - pt1[0], pt2[1] - pt1[1]]
+	difflen = viewX.mod(diff)
+	return [diff[0]/difflen, diff[1]/difflen]
+}
+
+viewX.unitVec = function(vec) {
+	return viewX.directionVec([0, 0], vec)
+}
+
+viewX.unitVec3D = function(vec) {
+	return viewX.scalarMultiplyVec3D(1/(viewX.mod3D(vec, [0, 0, 0])), vec)
+}
+
+viewX.rotatedVec = function(ofVector, angle) {
+	angle = angle*Math.PI/180;
+	rotatedXV = ofVector[0]*Math.cos(angle) - ofVector[1]*Math.sin(angle);
+	rotatedYV = ofVector[0]*Math.sin(angle) + ofVector[1]*Math.cos(angle);
+	return [rotatedXV, rotatedYV]
+}
+
+viewX.mod = function(ofVector) {
+	return viewX.distF(ofVector, [0,0])
+}
+
+viewX.angleBetweenVecs = function(vec1, vec2) {
+	// negative if vec2 is clockwise of vec1
+	// positive if vec2 is counterclockwise of vec1
+
+	vec1 = viewX.unitVec(vec1)
+	vec2 = viewX.unitVec(vec2)
+
+	angle = Math.atan2(vec2[1], vec2[0]) - Math.atan2(vec1[1], vec1[0])
+	if (angle < -Math.PI) {
+		angle = angle + 2*Math.PI
+	}
+	else if (angle > Math.PI) {
+		angle = angle - 2*Math.PI
+	}
+
+	return angle
+}
+
+
+viewX.centerOfPoints = function(points) {
+	sumVec = [0, 0]
+
+	for (var i = 0; i < points.length; i++) {
+		sumVec = viewX.addVec(sumVec, points[i])
+	}
+
+	return viewX.scalarMultiplyVec(1/points.length, sumVec)
+}
+
+viewX.shuffle = function(array) {
+	var currentIndex = array.length, temporaryValue, randomIndex;
+
+	// While there remain elements to shuffle...
+	while (0 !== currentIndex) {
+
+		// Pick a remaining element...
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex -= 1;
+
+		// And swap it with the current element.
+		temporaryValue = array[currentIndex];
+		array[currentIndex] = array[randomIndex];
+		array[randomIndex] = temporaryValue;
+	}
+	return array;
+}
+
+viewX.reflectionOnCollision = function(position, velocity, collidingPolygon, collisionZoneWidth=1e-2) {
+	smallVelocityVec = viewX.scalarMultiplyVec(collisionZoneWidth/2, viewX.unitVec(velocity))
+    smallStep = viewX.addVec(position, smallVelocityVec)
+
+	ray = {
+		from: position,
+		to: smallStep
+	}
+
+	possibleCollisionData = viewX.libraryFunctions.closestIntersectionBetweenRayAndPolygon(ray, collidingPolygon)
+
+	if (possibleCollisionData) {
+		if (viewX.distF(possibleCollisionData.point, position) < collisionZoneWidth) {
+			return {
+				position: position,
+				velocity: viewX.scalarMultiplyVec(viewX.mod(velocity), possibleCollisionData.reflection)
+			}
+		}
+		else {
+			return null
+		}
+	}
+	else {
+		return null
+	}
+}
+
+
+
+
+viewX.filterFunctions = {}
+viewX.filterFunctions.easeIn = function(xValuesObject, filterParameters={easeInPercentage: 0.20}) {
+	// ease in when x is some % of the way through the transition
+	// filterParameters = {easeInPercentage: 0.20}
+
+	easeInMark = xValuesObject.xv1 + filterParameters.easeInPercentage*(xValuesObject.xv2 - xValuesObject.xv1)
+
+	// Basic Ease In function
+
+	if (xValuesObject.inputvl < easeInMark) {
+		sqFactor = Math.pow((xValuesObject.inputvl - xValuesObject.xv1)/(easeInMark - xValuesObject.xv1), 2)
+		return xValuesObject.xv1 + sqFactor*(easeInMark - xValuesObject.xv1)
+	}
+	else {
+		return xValuesObject.inputvl
+	}
+
+}
+
+viewX.filterFunctions.identity = function(xValuesObject, filterParameters={}) {
+	return xValuesObject.inputvl
+}
+
+viewX.linearValueFiltered = function(xv1, xv2, yv1, yv2, inputvl, filterFunction=viewX.filterFunctions.identity, filterParameters={}) {
+	// filterFunction shifts x scale, for ease in and ease out, and other effects
+	// it takes three inputs, {xv1, xv2 and inputvl} as an object (Always between xv1 and xv2)
+	// filterFunction should be a function of xValuesObject and additional parameters object 
+
+	xValuesObject = {xv1: xv1, xv2: xv2, inputvl: inputvl}
+	filteredInputValue = filterFunction(xValuesObject, filterParameters)
+	return  yv1 + ((filteredInputValue - xv1)/(xv2 - xv1))*(yv2 - yv1)
+}
+
+
+viewX.libraryFunctions.findClosestRightAndLeftNumbersInArray = function(theArray, toTheNumber) {
+	theArray = theArray.slice()
+	for (let i = 0; i < theArray.length; i++) {
+		theArray[i] = parseFloat(theArray[i])
+	}
+	let valueLeft = null;
+	let valueRight = null;
+
+	for (let i = 0; i < theArray.length; i++) {
+		if (theArray[i] <= toTheNumber && (valueLeft === null || theArray[i] > valueLeft)) {
+			valueLeft = theArray[i];
+		}
+		if (theArray[i] > toTheNumber && (valueRight === null || theArray[i] < valueRight)) {
+			valueRight = theArray[i];
+		}
+	}
+
+	return [valueLeft, valueRight];
+
+}
+
+// Tested At https://www.desmos.com/calculator/etwtxbulcu
+
+viewX.libraryFunctions.intersectionBetweenRayAndLineSegment = function(ray, lineSegment) {
+	A = ray.from;
+	B = ray.to;
+	C = lineSegment.betweenPoint1;
+	D = lineSegment.betweenPoint2;
+
+	let AB = viewX.subtractVec(B, A);
+	let AC = viewX.subtractVec(C, A);
+	let CD = viewX.subtractVec(D, C);
+	
+	// Detecting parallelism
+	let determinant = CD[0]*AB[1] - CD[1]*AB[0];
+	if (determinant == 0) { // lines are parallel
+		return null;
+	}
+	
+	let r = ((AC[1]*CD[0]) - (AC[0]*CD[1])) / determinant;
+	let s = ((AC[1]*AB[0]) - (AC[0]*AB[1])) / determinant;
+	
+	if (r >= 0 && (s >= 0 && s <= 1)) {
+		// Point of intersection
+		let x = A[0] + r * AB[0];
+		let y = A[1] + r * AB[1];
+
+		return [x, y];
+	}
+	return null;
+}
+
+
+
+viewX.libraryFunctions.intersectionBetweenLineSegments = function(lineSegmentA, lineSegmentB) {
+	A = lineSegmentA.point1;
+	B = lineSegmentA.point2;
+	C = lineSegmentB.point1;
+	D = lineSegmentB.point2;
+
+	let AB = viewX.subtractVec(B, A);
+	let AC = viewX.subtractVec(C, A);
+	let CD = viewX.subtractVec(D, C);
+	
+	// Detecting parallelism
+	let determinant = CD[0]*AB[1] - CD[1]*AB[0];
+	if (determinant == 0) { // lines are parallel
+		return null;
+	}
+	
+	let r = ((AC[1]*CD[0]) - (AC[0]*CD[1])) / determinant;
+	let s = ((AC[1]*AB[0]) - (AC[0]*AB[1])) / determinant;
+	
+	if ((s >= 0 && s <= 1)) {
+		// Point of intersection
+		let x = A[0] + r * AB[0];
+		let y = A[1] + r * AB[1];
+
+		return [x, y];
+	}
+	return null;
+}
+
+viewX.libraryFunctions.closestIntersectionBetweenRayAndPolygon =  function(ray, polygon) {
+
+	let closestIntersect = null;
+	let closestDist = Infinity;
+	let closestLine = null;
+
+
+	for (let i = 0; i < polygon.length; i++) {
+		lineSegment = {
+			betweenPoint1: polygon[i],
+			betweenPoint2: polygon[(i + 1) % polygon.length]
+		}
+
+		const intersect = viewX.libraryFunctions.intersectionBetweenRayAndLineSegment(ray, lineSegment);
+		
+		if (intersect) {
+			const dist = viewX.distF(ray.to, intersect);
+			if (dist < closestDist) {
+				closestDist = dist;
+				closestIntersect = intersect;
+				closestLine = lineSegment;
+			}
+		}
+	}
+
+	if (closestIntersect) {
+		let AB = viewX.subtractVec(ray.to, ray.from);
+		let CD = viewX.subtractVec(closestLine.betweenPoint1, closestLine.betweenPoint2);
+		let normal = [-CD[1], CD[0]];
+		normalDirectionVec = viewX.unitVec(normal)
+		dot = viewX.dotProduct(AB, normalDirectionVec)
+
+		let reflection = [2*dot*normalDirectionVec[0] - AB[0], 2*dot*normalDirectionVec[1] - AB[1]];
+		reflection = viewX.directionVec(reflection, [0,0])
+		return { 
+			point: closestIntersect, 
+			reflection: reflection
+		};
+	} else {
+		return null; // No intersection
+	}
+}
+
+
+//  GPT-4 code 
+viewX.libraryFunctions.interpolatePoints = function(point1, point2, fraction) {
+    return point1.map((coord, index) => coord + fraction * (point2[index] - coord));
+}
+
+// viewX.libraryFunctions.interpolatePointsWithCommands = function(point1, point2, fraction) {
+//     return point1.map((coord, index) => coord + fraction * (point2[index] - coord));
+// }
+
+viewX.libraryFunctions.interpolateArrayOfPoints = function(xv1, xv2, A, B, inputv) {
+    if (inputv <= xv1) {
+        return A.slice();
+    } else if (inputv >= xv2) {
+        return B.slice();
+    }
+
+    let position = (inputv - xv1) / (xv2 - xv1);
+    let maxLength = Math.max(A.length, B.length);
+    let result = [];
+
+    for (let i = 0; i < maxLength; i++) {
+        let indexA = i * (A.length - 1) / (maxLength - 1);
+        let indexB = i * (B.length - 1) / (maxLength - 1);
+
+        // Interpolate or extrapolate points in A and B
+        let pointA = A[Math.min(Math.max(Math.round(indexA), 0), A.length - 1)];
+        let pointB = B[Math.min(Math.max(Math.round(indexB), 0), B.length - 1)];
+
+        // Interpolate between pointA and pointB
+        let interpolatedPoint = viewX.libraryFunctions.interpolatePoints(pointA, pointB, position);
+        result.push(interpolatedPoint);
+    }
+
+    return result;
+}
+
+viewX.libraryFunctions.interpolateArrayOfPointsWithCommands = function(xv1, xv2, A, B, inputv) {
+    if (inputv <= xv1) {
+        return A.slice();
+    } else if (inputv >= xv2) {
+        return B.slice();
+    }
+
+    let position = (inputv - xv1) / (xv2 - xv1);
+    let maxLength = Math.max(A.length, B.length);
+    let result = [];
+
+
+    for (let i = 0; i < maxLength; i++) {
+        let indexA = i * (A.length - 1) / (maxLength - 1);
+        let indexB = i * (B.length - 1) / (maxLength - 1);
+
+        // Interpolate or extrapolate points in A and B
+        let pointA = A[Math.min(Math.max(Math.round(indexA), 0), A.length - 1)];
+        let pointB = B[Math.min(Math.max(Math.round(indexB), 0), B.length - 1)];
+
+
+        // Interpolate between pointA and pointB
+
+		pointAStripped = [pointA.x, pointA.y]
+		pointBStripped = [pointB.x, pointB.y]
+
+        let interpolatedPoint = viewX.libraryFunctions.interpolatePoints(pointAStripped, pointBStripped, position);
+
+		if (pointA.command == 'M' || pointB.command == 'M') {
+			commandToUse = 'M'
+		}
+		else {
+			commandToUse = pointA.command
+		}
+
+		interpolatedPointWithCommands = {x: interpolatedPoint[0], y: interpolatedPoint[1], command: commandToUse}
+
+        result.push(interpolatedPointWithCommands);
+    }
+
+    return result;
+}
+
+
+viewX.libraryFunctions.numericalDerivative = function(f, h) {
+    return function(t) {
+        return (f(t + h) - f(t - h)) / (2 * h);
+    };
+};
+
+viewX.libraryFunctions.curveLength = function(derivFunc, a, b, stepSize) {
+    let length = 0;
+    for (let t = a; t <= b; t += stepSize) {
+        const magnitude = derivFunc(t);
+        length += magnitude * stepSize;
+    }
+    return length;
+};
+
+// GPT-4 code
+
+// Creates a parametric curve taking dimFunctions = [x(t), y(t), z(t)... ] as functions of t
+// Returns an array of points, where n is the number of points, with a and b being the start and end values of t. 
+// stepSize is the step size for the numerical derivative, and h is the step size for the numerical integration.
+
+viewX.libraryFunctions.segmentCurve = function(dimFunctions, a, b, n, stepSize, h) {
+    const dimPrimes = dimFunctions.map(dimFunc => viewX.libraryFunctions.numericalDerivative(dimFunc, h));
+
+    const derivFunc = t => {
+        return Math.sqrt(dimPrimes.reduce((sum, dimPrime) => sum + Math.pow(dimPrime(t), 2), 0));
+    };
+    
+    const S = viewX.libraryFunctions.curveLength(derivFunc, a, b, stepSize);
+    const segmentLength = S / n;
+    let currentLength = 0;
+    let t = a;
+    const points = [dimFunctions.map(dimFunc => dimFunc(a))];
+
+    while (t <= b) {
+        const magnitude = derivFunc(t);
+        currentLength += magnitude * stepSize;
+
+        if (currentLength >= segmentLength) {
+            points.push(dimFunctions.map(dimFunc => dimFunc(t)));
+            currentLength = 0; // or "currentLength -= segmentLength" for more accuracy
+        }
+
+        t += stepSize;
+    }
+
+    // Add the last point for t = b
+    points.push(dimFunctions.map(dimFunc => dimFunc(b)));
+
+    return points;
+};
+
+
+// GPT-4 code
+// Creates a parametric curve taking x, y, z as functions of t
+// Returns an array of points, where n is the number of points, with a and b being the start and end values of t.
+
+viewX.parametricCurvePoints = function(parametricFunctionArray, tLower, tUpper, numberOfPoints) {
+	return viewX.libraryFunctions.segmentCurve(parametricFunctionArray, tLower, tUpper, numberOfPoints, 0.001, 0.001)
+}
+
+// Example usage:
+// x = function(t) {
+// 	return Math.cos(t);
+// }
+
+// y = function(t) {
+// 	return Math.sin(t);
+// }
+
+// z = function(t) {
+// 	return t;
+// }
+
+// viewX.parametricCurvePoints(x, y, z, 0, 2*Math.PI, 1000)
+
+
+viewX.libraryFunctions.deepCopy = function(obj) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        // Handle arrays
+        return obj.map(item => viewX.libraryFunctions.deepCopy(item));
+    }
+
+    // Handle objects
+    const copy = {};
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            copy[key] = viewX.libraryFunctions.deepCopy(obj[key]);
+        }
+    }
+
+    return copy;
+}
+
+viewX.libraryFunctions.rgbaToHSLA = function({ r, g, b, a }) {
+	r /= 255;
+	g /= 255;
+	b /= 255;
+
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+	let h, s, l = (max + min) / 2;
+
+	if (max === min) {
+		h = s = 0; // achromatic
+	} else {
+		const delta = max - min;
+		s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+
+		switch (max) {
+			case r:
+				h = (g - b) / delta + (g < b ? 6 : 0);
+				break;
+			case g:
+				h = (b - r) / delta + 2;
+				break;
+			case b:
+				h = (r - g) / delta + 4;
+				break;
+		}
+		h /= 6;
+	}
+	return { h: h * 360, s: s * 100, l: l * 100, a };
+}
+
+viewX.libraryFunctions.toRGBA = function(col) {
+	let canvas = document.createElement("canvas");
+	canvas.width = canvas.height = 1;
+	let ctx = canvas.getContext("2d");
+	ctx.fillStyle = col;
+	ctx.fillRect(0, 0, 1, 1);
+
+	const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+	return { r, g, b, a: a / 255 };
+}
+
+viewX.libraryFunctions.toHSLA = function(color) {
+    const rgbaColor = viewX.libraryFunctions.toRGBA(color);
+    const hsla = viewX.libraryFunctions.rgbaToHSLA(rgbaColor);
+	return hsla
+}
+
+viewX.libraryFunctions.linearInterpolationHSLA = function(color1, color2, tStart, tEnd, t) {
+	const hsla1 = viewX.libraryFunctions.toHSLA(color1);
+	const hsla2 = viewX.libraryFunctions.toHSLA(color2);
+
+	const h = viewX.linearValue(tStart, tEnd, hsla1.h, hsla2.h, t);
+	const s = viewX.linearValue(tStart, tEnd, hsla1.s, hsla2.s, t);
+	const l = viewX.linearValue(tStart, tEnd, hsla1.l, hsla2.l, t);
+	const a = viewX.linearValue(tStart, tEnd, hsla1.a, hsla2.a, t);
+
+	return `hsla(${h}, ${s}%, ${l}%, ${a})`;
+}
+ 
+viewX.libraryFunctions.hueSupressedInterpolationHSLA = function(color1, color2, tStart, tEnd, t) {
+	const hsla1 = viewX.libraryFunctions.toHSLA(color1);
+	const hsla2 = viewX.libraryFunctions.toHSLA(color2);
+	// check if t is 25% of the way through the transition, between tstart and tend
+
+	fiftyMark = tStart + ((tEnd - tStart) / 2)
+
+	if (t < fiftyMark) {
+		var h = hsla1.h;
+		var s = viewX.linearValue(tStart, fiftyMark, hsla1.s, 0, t);
+		var l = viewX.linearValue(tStart, tEnd, hsla1.l, hsla2.l, t);
+		var a = viewX.linearValue(tStart, tEnd, hsla1.a, hsla2.a, t);
+	}
+	else {
+		var h = hsla2.h;
+		var s = viewX.linearValue(fiftyMark, tEnd, 0, hsla2.s, t);
+		var l = viewX.linearValue(tStart, tEnd, hsla1.l, hsla2.l, t);
+		var a = viewX.linearValue(tStart, tEnd, hsla1.a, hsla2.a, t);
+	}
+
+	return `hsla(${h}, ${s}%, ${l}%, ${a})`;
+}
+
+viewX.libraryFunctions.getMidPointForCurve = function(pointBeforePoint1, fromPoint1, toPoint2, pointAfterPoint2) {
+	p1p2Distance = viewX.distF(fromPoint1, toPoint2)
+	directorFromP1 = viewX.addVec(fromPoint1, viewX.scalarMultiplyVec(p1p2Distance, viewX.directionVec(pointBeforePoint1, fromPoint1)))
+
+	directorFromP2 = viewX.addVec(toPoint2, viewX.scalarMultiplyVec(p1p2Distance, viewX.directionVec(pointAfterPoint2, toPoint2)))
+
+	midPoint = viewX.scalarMultiplyVec(0.5, viewX.addVec(directorFromP1, directorFromP2))
+
+	return viewX.scalarMultiplyVec(0.5, viewX.addVec(directorFromP1, directorFromP2))
+}
+
+
+viewX.matrixMultiply4DVec = function(matrix, vec) {
+	if (matrix.length == 4 && matrix[0].length == 4 && vec.length == 4) {
+		result = []
+		for (var i = 0; i < 4; i++) {
+			sum = 0
+			for (var j = 0; j < 4; j++) {
+				sum = sum + matrix[i][j]*vec[j]
+			}
+			result.push(sum)
+		}
+		return result
+	}
+	else {
+		console.log("Matrix and vector dimensions do not match")
+	}
+}
+
+viewX.libraryFunctions.cameraComputations = function(camera={}) {
+	// camera has the following defaults
+
+	// camera.position: [0, 0, 10],
+	// camera.lookAt: [0, 0, 0],
+	// camera.up: [0, 1, 0],
+	// camera.fov: 90,
+	// camera.aspectRatio: 1,
+	// camera.near: 0.1,
+	// camera.far: 1000
+	// camera.screenWidth: 100,
+
+	cameraDefaults = {
+		position: [0, 0, 10],
+		lookAt: [0, 0, 0],
+		up: [0, 1, 0],
+		fov: 90,
+		aspectRatio: 1,
+		near: 0.1,
+		far: 1000,
+		screenWidth: 100
+	}
+
+
+	camera = Object.assign({}, cameraDefaults, camera);
+	
+	camera.forward = viewX.unitVec3D(viewX.subtractVec3D(camera.lookAt, camera.position))
+	camera.right = viewX.unitVec3D(viewX.crossProduct(camera.forward, camera.up))
+	camera.upAdjusted = viewX.unitVec3D(viewX.crossProduct(camera.right, camera.forward))
+
+	camera.screenHeight = camera.screenWidth/camera.aspectRatio
+
+	// camera.screenCenter = viewX.addVec3D(camera.position, viewX.scalarMultiplyVec3D(camera.near, camera.forward))
+
+	camera.viewMatrix = [[camera.right[0], camera.upAdjusted[0], camera.forward[0], 0], [camera.right[1], camera.upAdjusted[1], camera.forward[1], 0], [camera.right[2], camera.upAdjusted[2], camera.forward[2], 0]]
+
+	camera.viewMatrix.push([(-1)*viewX.dotProduct(camera.position, camera.right), (-1)*viewX.dotProduct(camera.position, camera.upAdjusted), (-1)*viewX.dotProduct(camera.position, camera.forward), 1])
+
+
+	camera.computed = true
+
+	return camera
+}
+
+viewX.libraryFunctions.getPointOnScreen = function(point=[1, 1, 1], camera={}) {
+	// point is of the form [1, 1, 1] and [1, 1, 1] is the default value
+	
+	if (!camera.computed) {
+		camera = viewX.libraryFunctions.cameraComputations(camera)
+	}
+
+	// matrix1 = [[1, -2, 1, 1], [7, 2.3, 1, 1], [5, 3, -1, -0.5], [1, 2, 0.3, 0.2]]
+	// matrix2 = [7, 7, 5, 7]
+	fourVector = point.concat(1)
+	// console.log(viewX.matrixMultiply4DVec(camera.viewMatrix, fourVector))
+
+
+}
+
+viewX.libraryFunctions.getPointOnScreen()
+
+
+
+
+
+
+
+
 viewX.graphToSvgY = function (value, graphymin, graphymax) {
 	if (graphymin == graphymax) {
 		graphymin = graphymin - 1
@@ -707,9 +1439,12 @@ viewX.updateGraphZoom = function(graphname, newMinMax) {
 	}
 }
 
-viewX.addGraph = function (parentdiv, name, gdata) {
-	gdata = gdata || {}
 
+viewX.addGraph = function (parentdiv, name, graphData) {
+
+	gdata = viewX.libraryFunctions.deepCopy(graphData) || {}
+
+	viewX.graphData.objectType[gdata.name] = 'graph'
 	gdata.name = name || 'graph' + Math.random().toString()
 
 	if (gdata.axislocationX != 0) {
@@ -749,6 +1484,7 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 		gdata.ymax = 0
 	}
 
+
 	gdata.unitAspectRatio = gdata.unitAspectRatio || 'no'
 	gdata.fixAxis = gdata.fixAxis || 'yaxis'
 	gdata.fixAxisStretchCentrally = gdata.fixAxisStretchCentrally || 'no'
@@ -783,12 +1519,12 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 	gdata.gridlinenumberX = gdata.gridlinenumberX || 10
 	gdata.gridlinenumberY = gdata.gridlinenumberY || 10
 
-	
-
 	gdata.parentW = parentdiv.offsetWidth
 	gdata.parentH = parentdiv.offsetHeight
 
+
 	aratio = parentdiv.offsetWidth/parentdiv.offsetHeight
+
 
 	if (gdata.unitAspectRatio == 'yes') {
 		if (gdata.fixAxis == 'yaxis') {
@@ -796,6 +1532,7 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 				centre = (gdata.xmax + gdata.xmin)/2
 				gdata.xmin = centre - ((gdata.ymax - gdata.ymin)*aratio/2)
 				gdata.xmax = centre + ((gdata.ymax - gdata.ymin)*aratio/2)
+				
 			}
 			else {
 				gdata.xmax = gdata.xmin + (gdata.ymax - gdata.ymin)*aratio
@@ -814,6 +1551,8 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 			
 		}
 	}
+
+	
 
 
 
@@ -991,6 +1730,7 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 		for (m = gdata.ylabelexclusionsstart; m < ymajortickvalues.length - gdata.ylabelexclusionsend; m++) {
 			ticklocation = ymajortickvalues[m]
 			value = ticklocation
+
 			if (eval(gdata.ymajorgridlabelOnlyIf)) {
 				var textElement = document.createElementNS("http://www.w3.org/2000/svg", 'text');
 				
@@ -998,6 +1738,9 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 				if(viewX.isInt(ticklocation)) {
 					if (gdata.isComplexPlane == 'yes') {
 						textElement.innerHTML = ticklocation + 'i'
+					}
+					else {
+						textElement.innerHTML = ticklocation
 					}
 				}
 				else {
@@ -1146,7 +1889,7 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 	gdata.scrollZoom = gdata.scrollZoom || 'yes'
 
 	if (gdata.scrollZoom == 'yes') {
-		svgElement.addEventListener('wheel', viewX.wheelHandle)
+		svgElement.addEventListener('wheel', viewX.wheelHandle(gdata.name))
 	}
 
 	viewX.svgPTVariable[name] = svgElement.createSVGPoint()
@@ -1162,8 +1905,8 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 	gdata.runFunctionDuringDrag = gdata.runFunctionDuringDrag || ''
 
 	if (gdata.draggability == 'yes') {
-		svgElement.addEventListener('mousedown', viewX.graphDragHandle)
-		svgElement.addEventListener('touchstart', viewX.graphDragHandle)
+		svgElement.addEventListener('mousedown', viewX.graphDragHandle(gdata.name))
+		svgElement.addEventListener('touchstart', viewX.graphDragHandle(gdata.name))
 	}
 	// else {
 	// 	svgElement.addEventListener('touchmove', viewX.graphTouchDisable)
@@ -1189,8 +1932,9 @@ viewX.addGraph = function (parentdiv, name, gdata) {
 
 	gdata.aspectratio = aratio
 
-
-	viewX.graphData[name] = gdata
+	
+	
+	viewX.graphData[name] =  Object.assign({}, gdata);
 	return JSON.parse(JSON.stringify(gdata));
 }
 
@@ -1227,12 +1971,16 @@ viewX.addLine = function(graphname, linename, lineoptions) {
 	lineoptions = lineoptions || {}
 
 	aratio = gdata.aspectratio
-
+	viewX.graphData.objectType[linename] = 'line'
 	lineoptions.x1 = parseFloat(lineoptions.x1.toString() || 0)
 	lineoptions.y1 = parseFloat(lineoptions.y1.toString() || 0)
 	lineoptions.x2 = parseFloat(lineoptions.x2.toString() || 0.5)
 	lineoptions.y2 = parseFloat(lineoptions.y2.toString() || 0.5)
 	lineoptions.name = linename || viewX.uid
+
+	if (lineoptions.opacity == undefined) {
+		lineoptions.opacity = 1
+	}
 
 	lineoptions.strokedasharray = lineoptions.strokedasharray || ""
 	lineoptions.strokewidth = lineoptions.strokewidth || 1
@@ -1244,6 +1992,7 @@ viewX.addLine = function(graphname, linename, lineoptions) {
 	lineElement.setAttribute('x2', viewX.graphToScaledX(lineoptions.x2, gdata.xmin, gdata.xmax, aratio) + '%')
 	lineElement.setAttribute('y2', viewX.graphToScaledY(lineoptions.y2, gdata.ymin, gdata.ymax, aratio) + '%');
 	lineElement.setAttribute('stroke-dasharray', lineoptions.strokedasharray);
+	lineElement.style.opacity = lineoptions.opacity;
 	
 	lineElement.setAttribute('id', graphname + '-line-' + linename)
 	viewX.uid = viewX.uid + 1
@@ -1258,13 +2007,11 @@ viewX.addLine = function(graphname, linename, lineoptions) {
 
 
 viewX.updateLine = function(graphname, linename, linevalues) {
-
 	gdata = viewX.graphData[graphname]
 	aratio = gdata.aspectratio
-
 	lineoptions = gdata.lineData[linename][1]
 	lineElement = gdata.lineData[linename][0]
-	
+
 	if (linevalues.x1 != 0) {
 		lineoptions.x1 = linevalues.x1 || lineoptions.x1	
 	}
@@ -1300,12 +2047,17 @@ viewX.updateLine = function(graphname, linename, linevalues) {
 	lineoptions.strokewidth = linevalues.strokewidth || lineoptions.strokewidth
 	lineoptions.linecolor = linevalues.linecolor || lineoptions.linecolor
 
+	if (linevalues.opacity !== undefined) {
+		lineoptions.opacity = linevalues.opacity
+	}
+
 	lineElement.setAttribute('x1', viewX.graphToScaledX(lineoptions.x1, gdata.xmin, gdata.xmax, aratio) + '%');
 	lineElement.setAttribute('y1', viewX.graphToScaledY(lineoptions.y1, gdata.ymin, gdata.ymax, aratio) + '%');
 	lineElement.setAttribute('x2', viewX.graphToScaledX(lineoptions.x2, gdata.xmin, gdata.xmax, aratio) + '%')
 	lineElement.setAttribute('y2', viewX.graphToScaledY(lineoptions.y2, gdata.ymin, gdata.ymax, aratio) + '%');
 
 	lineElement.setAttribute('stroke-dasharray', lineoptions.strokedasharray);
+	lineElement.style.opacity = lineoptions.opacity;
 	lineElement.style.stroke = lineoptions.linecolor
 	lineElement.style.strokeWidth = lineoptions.strokewidth + '%';
 	
@@ -1316,7 +2068,7 @@ viewX.updateLine = function(graphname, linename, linevalues) {
 viewX.addSlider = function(graphname, slidername, slideroptions) {
 	gdata = viewX.graphData[graphname]
 	slideroptions = slideroptions || {}
-
+	viewX.graphData.objectType[slidername] = 'slider'
 	aratio = gdata.aspectratio
 
 	slideroptions.x1 = parseFloat(slideroptions.x1.toString() || 0)
@@ -1458,41 +2210,149 @@ viewX.divSlider = function(holder, divslidername, minval, maxval, currvalue, ste
 	viewX.addSliderToDiv(holder, divslidername, options)
 }
 
+// GPT 3.5
+
+viewX.generateSliderStyles = function(sliderProperties, elementId) {
+	var css = "";
+
+      css += "#" + elementId + " {";
+      css += "min-width: " + sliderProperties.minwidth + ";";
+	  css += "width: " + sliderProperties.width + ";";
+      css += "height: " + sliderProperties.height + "px;";
+      css += "background: " + sliderProperties.trackColor + ";";
+      css += "opacity: " + sliderProperties.opacity + ";";
+      css += "transition: opacity 0.2s;";
+	  css += "border-radius: 15px;";
+      css += "}";
+	  
+
+      css += "#" + elementId + "::-webkit-slider-thumb {";
+      css += "-webkit-appearance: none !important;";
+      css += "appearance: none !important;";
+      css += "width: " + sliderProperties.thumbWidth + "px;";
+      css += "height: " + sliderProperties.thumbHeight + "px;";
+      css += "background: " + sliderProperties.thumbColor + ";";
+      css += "cursor: pointer;";
+      css += "border-radius: 50%;";
+	  css += "border: none;";
+      css += "margin-top: -" + (sliderProperties.thumbHeight / 2 - sliderProperties.height / 2) + "px;";
+      css += "}";
+
+      css += "#" + elementId + "::-webkit-slider-runnable-track {";
+      css += "height: " + sliderProperties.height + "px;";
+	  css += "border-radius: 12px;";
+      css += "background: " + sliderProperties.trackColor + ";";
+      css += "}";
+
+      css += "#" + elementId + "::-moz-range-thumb {";
+      css += "width: " + sliderProperties.thumbWidth + "px;";
+      css += "height: " + sliderProperties.thumbHeight + "px;";
+      css += "background: " + sliderProperties.thumbColor + ";";
+      css += "cursor: pointer;";
+      css += "border-radius: 50%;";
+	  css += "border: none;";
+      css += "margin-top: -" + (sliderProperties.thumbHeight / 2 - sliderProperties.height / 2) + "px;";
+      css += "}";
+
+      css += "#" + elementId + "::-moz-range-progress {";
+      css += "height: " + sliderProperties.height + "px;";
+      css += "background-color: " + sliderProperties.trackFillColor + ";";
+      css += "}";
+
+      css += "#" + elementId + "::-moz-range-track {";
+      css += "height: " + sliderProperties.height + "px;";
+      css += "background: " + sliderProperties.trackColor + ";";
+      css += "}";
+
+      css += "#" + elementId + "::-ms-thumb {";
+      css += "width: " + sliderProperties.thumbWidth + "px;";
+      css += "height: " + sliderProperties.thumbHeight + "px;";
+      css += "background: " + sliderProperties.thumbColor + ";";
+      css += "cursor: pointer;";
+      css += "border-radius: 50%;";
+      css += "margin-top: 0;";
+      css += "}";
+
+      css += "#" + elementId + "::-ms-fill-lower {";
+      css += "background: " + sliderProperties.trackFillColor + ";";
+      css += "}";
+
+      css += "#" + elementId + "::-ms-fill-upper {";
+      css += "background: " + sliderProperties.trackColor + ";";
+      css += "}";
+
+      css += "#" + elementId + "::-ms-tooltip {";
+      css += "display: none;";
+      css += "}";
+
+
+	var styleElement = document.createElement("style");
+	styleElement.innerHTML = css;
+    styleElement.style.setProperty('--track-fill-color-for-' + elementId, sliderProperties.trackFillColor);
+
+	document.head.appendChild(styleElement);
+}
 
 viewX.addPath = function(graphname, pathname, pathoptions) {
 	gdata = viewX.graphData[graphname]
 	pathoptions = pathoptions || {}
-
+	viewX.graphData.objectType[pathname] = 'path'
 	aratio = gdata.aspectratio
 
 	pathoptions.points = pathoptions.points || [[0, 1], [1, 0]]
+	
+	if (pathoptions.points[0].command != null) {
+		// points are not given, but directly the path string is given
+		
+		pathstring = ""
 
-	pathstring = 'M'
+		for (pth = 0; pth < pathoptions.points.length; pth++) {
+		
+			pathstring += pathoptions.points[pth].command + ' ' + viewX.graphToScaledX(pathoptions.points[pth].x, gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth].y, gdata.ymin, gdata.ymax, aratio) + ' '
+		}
 
-	for (pth = 0; pth < pathoptions.points.length; pth++) {
-		if (pth == 0) {
-			pathstring = pathstring + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
-		}
-		else {
-			pathstring = pathstring + 'L' + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
-		}
+		// console.log(pathstring)
 		
 	}
+	else {
+		pathstring = 'M'
+
+		for (pth = 0; pth < pathoptions.points.length; pth++) {
+			if (pth == 0) {
+				pathstring = pathstring + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
+			}
+			else {
+				pathstring = pathstring + 'L' + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
+			}
+			
+		}
+	}
+
+	
 
 	pathoptions.name = pathname || viewX.uid
 
 	pathoptions.strokewidth = pathoptions.strokewidth || 1
 	pathoptions.pathcolor = pathoptions.pathcolor || 'hsla(190, 100%, 50%, 1)'
 	pathoptions.pathfillcolor = pathoptions.pathfillcolor || 'none'
+	pathoptions.pathEvenOdd = pathoptions.pathEvenOdd || 'evenodd'
+	pathoptions.strokedasharray = pathoptions.strokedasharray || ''
+	if (pathoptions.opacity == undefined) {
+		pathoptions.opacity = 1
+	}
 
 	var pathElement = document.createElementNS("http://www.w3.org/2000/svg", 'path');
 	try {
 		pathElement.setAttribute('d', pathstring);
 		pathElement.setAttribute('id', graphname + '-path-' + pathname)
+		pathElement.setAttribute('stroke-dasharray', pathoptions.strokedasharray);
+		pathElement.style.opacity = pathoptions.opacity;
 		viewX.uid = viewX.uid + 1
 		pathElement.style.stroke = pathoptions.pathcolor
 		pathElement.style.fill = pathoptions.pathfillcolor;
+		pathElement.style.fillRule = pathoptions.pathEvenOdd;
 		pathElement.style.strokeWidth = pathoptions.strokewidth + '%';
+		
 		gdata.svgElement.appendChild(pathElement);
 
 		viewX.graphData[graphname].pathData[pathname] = [pathElement, pathoptions]
@@ -1507,6 +2367,7 @@ viewX.addPath = function(graphname, pathname, pathoptions) {
 viewX.addArrow = function(graphname, arrowname, arrowoptions) {
 	gdata = viewX.graphData[graphname]
 	arrowoptions = arrowoptions || {}
+	viewX.graphData.objectType[arrowname] = 'arrow'
 
 	aratio = gdata.aspectratio
 
@@ -1540,9 +2401,16 @@ viewX.addArrow = function(graphname, arrowname, arrowoptions) {
 
 	arrowstring = arrowstring + 'M' + arrowHeadDirectionHeadPoint[0] + ' ' + arrowHeadDirectionHeadPoint[1] + ' ';
 	arrowstring = arrowstring + 'L' + arrowTo[0] + ' ' + arrowTo[1] + ' ';
+	
 
 	arrowoptions.name = arrowname || viewX.uid;
 	arrowoptions.arrowcolor = arrowoptions.arrowcolor || 'hsla(0, 0%, 0%, 1)';
+
+	arrowoptions.strokedasharray = arrowoptions.strokedasharray || ''
+
+	if (arrowoptions.opacity == undefined) {
+		arrowoptions.opacity = 1
+	}
 
 	var arrowElement = document.createElementNS("http://www.w3.org/2000/svg", 'path');
 	try {
@@ -1552,7 +2420,10 @@ viewX.addArrow = function(graphname, arrowname, arrowoptions) {
 		arrowElement.style.stroke = arrowoptions.arrowcolor;
 		arrowElement.style.fill = 'none';
 		arrowElement.style.strokeWidth = arrowoptions.strokewidth + '%';
+		arrowElement.setAttribute('stroke-dasharray', arrowoptions.strokedasharray);
+		arrowElement.style.opacity = arrowoptions.opacity;
 		gdata.svgElement.appendChild(arrowElement);
+		
 
 		viewX.graphData[graphname].arrowData[arrowname] = [arrowElement, arrowoptions]
 		return [arrowElement, arrowoptions]
@@ -1578,6 +2449,10 @@ viewX.updateArrow = function(graphname, arrowname, newarrowoptions) {
 
 	arrowoptions.from = newarrowoptions.from || arrowoptions.from;
 	arrowoptions.to = newarrowoptions.to || arrowoptions.to;
+	arrowoptions.strokedasharray = newarrowoptions.strokedasharray || arrowoptions.strokedasharray;
+	if (newarrowoptions.opacity !== undefined) {
+		arrowoptions.opacity = newarrowoptions.opacity
+	}
 
 
 	arrowFrom = [viewX.graphToScaledX(arrowoptions.from[0], gdata.xmin, gdata.xmax, aratio), viewX.graphToScaledY(arrowoptions.from[1], gdata.ymin, gdata.ymax, aratio)]
@@ -1614,7 +2489,8 @@ viewX.updateArrow = function(graphname, arrowname, newarrowoptions) {
 		arrowElement.style.stroke = arrowoptions.arrowcolor
 		arrowElement.style.fill = 'none'
 		arrowElement.style.strokeWidth = arrowoptions.strokewidth + '%';
-		
+		arrowElement.setAttribute('stroke-dasharray', arrowoptions.strokedasharray);
+		arrowElement.style.opacity = arrowoptions.opacity;
 		viewX.graphData[graphname].arrowData[arrowname] = [arrowElement, arrowoptions]
 	}
 
@@ -1624,7 +2500,7 @@ viewX.updateArrow = function(graphname, arrowname, newarrowoptions) {
 		
 }
 
-viewX.updatePath = function(graphname, pathname, newpathoptions) {
+viewX.updatePath = function(graphname, pathname, newpathoptions) {	
 
 	gdata = viewX.graphData[graphname]
 	aratio = gdata.aspectratio
@@ -1633,19 +2509,32 @@ viewX.updatePath = function(graphname, pathname, newpathoptions) {
 	pathElement = gdata.pathData[pathname][0]
 
 
-
+	
 	pathoptions.points = newpathoptions.points || pathoptions.points
 
-	pathstring = 'M'
+	if (pathoptions.points[0].command != null) {
+		// points are not given, but directly the path string is given
 
-	for (pth = 0; pth < pathoptions.points.length; pth++) {
-		if (pth == 0) {
-			pathstring = pathstring + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
-		}
-		else {
-			pathstring = pathstring + 'L' + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
+		pathstring = ""
+
+		for (pth = 0; pth < pathoptions.points.length; pth++) {
+			pathstring += pathoptions.points[pth].command + ' ' + viewX.graphToScaledX(pathoptions.points[pth].x, gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth].y, gdata.ymin, gdata.ymax, aratio) + ' '
 		}
 		
+	}
+	else {
+
+		pathstring = 'M'
+
+		for (pth = 0; pth < pathoptions.points.length; pth++) {
+			if (pth == 0) {
+				pathstring = pathstring + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
+			}
+			else {
+				pathstring = pathstring + 'L' + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
+			}
+			
+		}
 	}
 
 
@@ -1654,12 +2543,22 @@ viewX.updatePath = function(graphname, pathname, newpathoptions) {
 		pathoptions.strokewidth = newpathoptions.strokewidth || pathoptions.strokewidth
 		pathoptions.pathcolor = newpathoptions.pathcolor || pathoptions.pathcolor
 		pathoptions.pathfillcolor = newpathoptions.pathfillcolor || pathoptions.pathfillcolor
+		pathoptions.pathEvenOdd = newpathoptions.pathEvenOdd || pathoptions.pathEvenOdd
+		pathoptions.strokedasharray = newpathoptions.strokedasharray || pathoptions.strokedasharray
+
+		if (newpathoptions.opacity !== undefined) {
+			pathoptions.opacity = newpathoptions.opacity
+		}
 
 		pathElement.style.stroke = pathoptions.pathcolor
 		pathElement.style.fill = pathoptions.pathfillcolor
 		pathElement.style.strokeWidth = pathoptions.strokewidth + '%';
+		pathElement.setAttribute('stroke-dasharray', pathoptions.strokedasharray);
+		pathElement.style.fillRule = pathoptions.pathEvenOdd;
+		pathElement.style.opacity = pathoptions.opacity;
 		
 		viewX.graphData[graphname].pathData[pathname] = [pathElement, pathoptions]
+		return [pathElement, pathoptions]
 	}
 
 	catch (err){
@@ -1677,26 +2576,42 @@ viewX.updatePathPoints = function(graphname, pathname, npathpoints) {
 
 	pathoptions.points = npathpoints || pathoptions.points
 
-	if (pathoptions.points.length > 0) {
-		pathstring = 'M'
+	if (pathoptions.points[0].command != null) {
+		// points are not given, but directly the path string is given
+		
+		pathstring = ""
 
 		for (pth = 0; pth < pathoptions.points.length; pth++) {
-			if (pth == 0) {
-				pathstring = pathstring + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
-			}
-			else {
-				pathstring = pathstring + 'L' + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
-			}
-			
+			pathstring += pathoptions.points[pth].command + ' ' + viewX.graphToScaledX(pathoptions.points[pth].x, gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth].y, gdata.ymin, gdata.ymax, aratio) + ' '
 		}
 
-		try {
-			pathElement.setAttribute('d', pathstring);
-			viewX.graphData[graphname].pathData[pathname] = [pathElement, pathoptions]
-			return [pathElement, pathoptions]
-		}
-		catch (err){
-			console.log(npathpoints)
+		pathElement.setAttribute('d', pathstring);
+		viewX.graphData[graphname].pathData[pathname] = [pathElement, pathoptions]
+		return [pathElement, pathoptions]
+	}
+	else {
+
+		if (pathoptions.points.length > 0) {
+			pathstring = 'M'
+
+			for (pth = 0; pth < pathoptions.points.length; pth++) {
+				if (pth == 0) {
+					pathstring = pathstring + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
+				}
+				else {
+					pathstring = pathstring + 'L' + viewX.graphToScaledX(pathoptions.points[pth][0], gdata.xmin, gdata.xmax, aratio) + ' ' + viewX.graphToScaledY(pathoptions.points[pth][1], gdata.ymin, gdata.ymax, aratio) + ' '
+				}
+				
+			}
+
+			try {
+				pathElement.setAttribute('d', pathstring);
+				viewX.graphData[graphname].pathData[pathname] = [pathElement, pathoptions]
+				return [pathElement, pathoptions]
+			}
+			catch (err){
+				console.log(npathpoints)
+			}
 		}
 	}
 	
@@ -1712,28 +2627,23 @@ viewX.distanceBTWgraphToSvg = function(p1, p2, xmin, xmax, ymin, ymax, aspectrat
 viewX.addCircle = function(graphname, circlename, circleoptions) {
 	gdata = viewX.graphData[graphname]
 	circleoptions = circleoptions || {}
+	viewX.graphData.objectType[circlename] = 'circle'
 	aratio = gdata.aspectratio
 
-	if (circleoptions.x != 0) {
-		circleoptions.x = circleoptions.x || 0.3
-	}
-	else {
-		circleoptions.x = 0
+
+	if (circleoptions.x == undefined || circleoptions.x == null) {
+		circleoptions.x = 0.3
 	}
 
-	if (circleoptions.y != 0) {
-		circleoptions.y = circleoptions.y || 0.3
-	}
-	else {
-		circleoptions.y = 0
+	if (circleoptions.y == undefined || circleoptions.y == null) {
+		circleoptions.y = 0.3
 	}
 
-	if (circleoptions.radius != 0) {
-		circleoptions.radius = circleoptions.radius || 0.3
+	if (circleoptions.radius == undefined || circleoptions.radius == null) {
+		circleoptions.radius = 0.3
 	}
-	else {
-		circleoptions.radius = 0
-	}
+	
+
 
 	circleoptions.name = circlename || viewX.uid
 
@@ -1741,6 +2651,10 @@ viewX.addCircle = function(graphname, circlename, circleoptions) {
 	circleoptions.strokewidth = circleoptions.strokewidth || 0.1
 	
 	circleoptions.circlecolor = circleoptions.circlecolor || 'hsla(190, 100%, 50%, 1)'
+	circleoptions.strokedasharray = circleoptions.strokedasharray || ''
+	if (circleoptions.opacity == undefined) {
+		circleoptions.opacity = 1
+	}
 
 	rx = viewX.distanceBTWgraphToSvg([0,0],[circleoptions.radius, 0], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
 	ry = viewX.distanceBTWgraphToSvg([0,0],[0, circleoptions.radius], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
@@ -1753,6 +2667,10 @@ viewX.addCircle = function(graphname, circlename, circleoptions) {
 	circleElement.setAttribute('id', graphname + '-circle-' + circlename)
 	viewX.uid = viewX.uid + 1
 	circleElement.setAttribute('vector-effect','non-scaling-stroke');
+	
+	circleElement.style.opacity = circleoptions.opacity;
+
+
 	circleElement.style.fill = circleoptions.circlecolor
 	circleElement.style.strokeWidth = circleoptions.strokewidth + '%';
 	circleElement.style.stroke = circleoptions.stroke;
@@ -1764,34 +2682,25 @@ viewX.addCircle = function(graphname, circlename, circleoptions) {
 }
 
 viewX.updateCircle = function(graphname, circlename, circlenewvalues) {
-
 	gdata = viewX.graphData[graphname]
 	aratio = gdata.aspectratio
 
 	circleoptions = gdata.circleData[circlename][1]
 	circleElement = gdata.circleData[circlename][0]
-
-
-	if (circleoptions.x != 0) {
+	
+	if (circlenewvalues.x != undefined && circlenewvalues.x != null) {
 		circleoptions.x = circlenewvalues.x || circleoptions.x
 	}
-	else {
-		circleoptions.x = circlenewvalues.x
-	}
 
-	if (circleoptions.y != 0) {
+	if (circlenewvalues.y != undefined && circlenewvalues.y != null) {
 		circleoptions.y = circlenewvalues.y || circleoptions.y
 	}
-	else {
-		circleoptions.y = circlenewvalues.y
-	}
 
-	if (circleoptions.radius != 0) {
+	if (circlenewvalues.radius != undefined && circlenewvalues.radius != null) {
 		circleoptions.radius = circlenewvalues.radius || circleoptions.radius
 	}
-	else {
-		circleoptions.radius = circlenewvalues.radius
-	}
+
+	
 
 	circleoptions.name = circlename || viewX.uid
 
@@ -1799,6 +2708,10 @@ viewX.updateCircle = function(graphname, circlename, circlenewvalues) {
 	circleoptions.strokewidth = circlenewvalues.strokewidth || circleoptions.strokewidth
 	
 	circleoptions.circlecolor = circlenewvalues.circlecolor || circleoptions.circlecolor
+	circleoptions.strokedasharray = circlenewvalues.strokedasharray || circleoptions.strokedasharray
+	if (circlenewvalues.opacity !== undefined) {
+		circleoptions.opacity = circlenewvalues.opacity
+	}
 
 	rx = viewX.distanceBTWgraphToSvg([0,0],[circleoptions.radius, 0], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
 	ry = viewX.distanceBTWgraphToSvg([0,0],[0, circleoptions.radius], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
@@ -1814,6 +2727,7 @@ viewX.updateCircle = function(graphname, circlename, circlenewvalues) {
 	circleElement.style.strokeWidth = circleoptions.strokewidth + '%';
 	circleElement.style.stroke = circleoptions.stroke;
 	circleElement.setAttribute('stroke-dasharray', circleoptions.strokedasharray);
+	circleElement.style.opacity = circleoptions.opacity;
 	
 	viewX.graphData[graphname].circleData[circlename] = [circleElement, circleoptions]
 }
@@ -1824,6 +2738,7 @@ viewX.addEllipse = function(graphname, ellipsename, ellipseoptions) {
 	aratio = gdata.aspectratio
 
 	ellipseoptions = ellipseoptions || {}
+	viewX.graphData.objectType[ellipsename] = 'ellipse'
 
 	ellipseoptions.x = parseFloat(ellipseoptions.x.toString() || 0)
 	ellipseoptions.y = parseFloat(ellipseoptions.y.toString() || 0)
@@ -1835,6 +2750,11 @@ viewX.addEllipse = function(graphname, ellipsename, ellipseoptions) {
 	ellipseoptions.strokewidth = ellipseoptions.strokewidth || 0.1
 	
 	ellipseoptions.ellipsecolor = ellipseoptions.ellipsecolor || 'hsla(190, 100%, 50%, 1)'
+	ellipseoptions.strokedasharray = ellipseoptions.strokedasharray || ''
+
+	if (ellipseoptions.opacity == undefined) {
+		ellipseoptions.opacity = 1
+	}
 
 	rx = viewX.distanceBTWgraphToSvg([0,0],[ellipseoptions.rx, 0], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
 	ry = viewX.distanceBTWgraphToSvg([0,0],[0, ellipseoptions.ry], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
@@ -1847,6 +2767,9 @@ viewX.addEllipse = function(graphname, ellipsename, ellipseoptions) {
 	ellipseElement.setAttribute('id', graphname + '-ellipse-' + ellipsename)
 	viewX.uid = viewX.uid + 1
 	ellipseElement.setAttribute('vector-effect','non-scaling-stroke');
+	ellipseElement.style.opacity = ellipseoptions.opacity;
+	ellipseElement.setAttribute('stroke-dasharray', ellipseoptions.strokedasharray);
+
 	ellipseElement.style.fill = ellipseoptions.ellipsecolor
 	ellipseElement.style.strokeWidth = ellipseoptions.strokewidth + '%';
 	ellipseElement.style.stroke = ellipseoptions.stroke;
@@ -1896,6 +2819,10 @@ viewX.updateEllipse = function(graphname, ellipsename, ellipsenewvalues) {
 	ellipseoptions.strokewidth = ellipsenewvalues.strokewidth || ellipseoptions.strokewidth
 	
 	ellipseoptions.ellipsecolor = ellipsenewvalues.ellipsecolor || ellipseoptions.ellipsecolor
+	ellipseoptions.strokedasharray = ellipsenewvalues.strokedasharray || ellipseoptions.strokedasharray
+	if (ellipsenewvalues.opacity !== undefined) {
+		ellipseoptions.opacity = ellipsenewvalues.opacity
+	}
 
 	rx = viewX.distanceBTWgraphToSvg([0,0],[ellipseoptions.rx, 0], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
 	ry = viewX.distanceBTWgraphToSvg([0,0],[0, ellipseoptions.ry], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
@@ -1907,6 +2834,9 @@ viewX.updateEllipse = function(graphname, ellipsename, ellipsenewvalues) {
 	ellipseElement.setAttribute('id', graphname + '-ellipse-' + ellipsename)
 	viewX.uid = viewX.uid + 1
 	ellipseElement.setAttribute('vector-effect','non-scaling-stroke');
+	ellipseElement.style.opacity = ellipseoptions.opacity;
+	ellipseElement.setAttribute('stroke-dasharray', ellipseoptions.strokedasharray);
+
 	ellipseElement.style.fill = ellipseoptions.ellipsecolor
 	ellipseElement.style.strokeWidth = ellipseoptions.strokewidth + '%';
 	ellipseElement.style.stroke = ellipseoptions.stroke;
@@ -1918,7 +2848,7 @@ viewX.updateEllipse = function(graphname, ellipsename, ellipsenewvalues) {
 viewX.addText = function(graphname, textname, textoptions) {
 	gdata = viewX.graphData[graphname]
 	textoptions = textoptions || {}
-
+	viewX.graphData.objectType[textname] = 'text'
 	aratio = gdata.aspectratio
 
 	textoptions.x = parseFloat(textoptions.x.toString() || 0)
@@ -1931,6 +2861,10 @@ viewX.addText = function(graphname, textname, textoptions) {
 	textoptions.fontFamily = textoptions.fontFamily || 'Source Sans Pro'
 	
 	textoptions.textcolor = textoptions.textcolor || 'hsla(190, 100%, 0%, 1)'
+
+	if (textoptions.opacity == undefined) {
+		textoptions.opacity = 1
+	}
 	
 	var textElement = document.createElementNS("http://www.w3.org/2000/svg", 'text');
 	textElement.setAttribute('x', viewX.graphToScaledX(textoptions.x, gdata.xmin, gdata.xmax, aratio) + '%');
@@ -1938,10 +2872,12 @@ viewX.addText = function(graphname, textname, textoptions) {
 	textElement.setAttribute('id', graphname + '-text-' + textname)
 	viewX.uid = viewX.uid + 1
 	textElement.setAttribute('vector-effect','non-scaling-stroke');
+	textElement.style.opacity = textoptions.opacity;
 	textElement.style.fill = textoptions.textcolor
 	textElement.innerHTML = textoptions.text
 	textElement.style.fontFamily = textoptions.fontFamily
-	textElement.style.fontSize = textoptions.fontSize;
+	textElement.style.fontSize = textoptions.fontSize + 'px';
+
 	if (textoptions.textAlign == 'center') {
 		textElement.setAttribute('text-anchor','middle')
 	}
@@ -1964,12 +2900,19 @@ viewX.updateText = function(graphname, textname, textvalues) {
 	textoptions.y = textvalues.y || textoptions.y
 	textoptions.textcolor = textvalues.textcolor || textoptions.textcolor
 	textoptions.fontSize = textvalues.fontSize || textoptions.fontSize
+	textoptions.fontFamily = textvalues.fontFamily || textoptions.fontFamily
+
+	if (textvalues.opacity !== undefined) {
+		textoptions.opacity = textvalues.opacity
+	}
 
 	textElement.innerHTML = textoptions.text
 	textElement.setAttribute('x', viewX.graphToScaledX(textoptions.x, gdata.xmin, gdata.xmax, aratio) + '%');
 	textElement.setAttribute('y', viewX.graphToScaledY(textoptions.y, gdata.ymin, gdata.ymax, aratio) + '%');
+	textElement.style.opacity = textoptions.opacity;
+	textElement.style.fontFamily = textoptions.fontFamily
 	textElement.style.fill = textoptions.textcolor
-	textElement.style.fontSize = textoptions.fontSize;
+	textElement.style.fontSize = textoptions.fontSize + "px"
 	
 	viewX.graphData[graphname].textData[textname] = [textElement, textoptions]
 	return [textElement, textoptions]
@@ -1979,6 +2922,7 @@ viewX.addRectangle = function(graphname, rectname, rectoptions) {
 	gdata = viewX.graphData[graphname]
 	aratio = gdata.aspectratio
 	rectoptions = rectoptions || {}
+	viewX.graphData.objectType[rectname] = 'rectangle'
 
 	rectoptions.x = parseFloat(rectoptions.x.toString() || 0)
 	rectoptions.y = parseFloat(rectoptions.y.toString() || 0)
@@ -1989,6 +2933,10 @@ viewX.addRectangle = function(graphname, rectname, rectoptions) {
 	rectoptions.stroke = rectoptions.stroke || 'hsla(190, 100%, 50%, 0.5)'
 	rectoptions.strokewidth = rectoptions.strokewidth || 0.1
 	rectoptions.strokedasharray = rectoptions.strokedasharray || ""
+
+	if (rectoptions.opacity == undefined) {
+		rectoptions.opacity = 1
+	}
 
 	
 	rectoptions.rectcolor = rectoptions.rectcolor || 'hsla(190, 100%, 50%, 1)'
@@ -2007,6 +2955,7 @@ viewX.addRectangle = function(graphname, rectname, rectoptions) {
 	rectElement.style.fill = rectoptions.rectcolor
 	rectElement.style.strokeWidth = rectoptions.strokewidth + '%';
 	rectElement.style.stroke = rectoptions.stroke;
+	rectElement.style.opacity = rectoptions.opacity;
 	rectElement.setAttribute('stroke-dasharray', rectoptions.strokedasharray);
 
 	gdata.svgElement.appendChild(rectElement);
@@ -2057,6 +3006,16 @@ viewX.updateRectangle = function(graphname, rectname, rectvalueupdate) {
 	rectoptions.strokewidth = rectvalueupdate.strokewidth || rectoptions.strokewidth
 	
 	rectoptions.rectcolor = rectvalueupdate.rectcolor || rectoptions.rectcolor
+	rectoptions.strokedasharray = rectvalueupdate.strokedasharray || rectoptions.strokedasharray
+
+	if (rectvalueupdate.opacity != 0) {
+		rectoptions.opacity = rectvalueupdate.opacity || rectoptions.opacity
+	}
+	else {
+		rectoptions.opacity = rectvalueupdate.opacity
+	}
+
+	
 
 	rx = viewX.distanceBTWgraphToSvg([0,0],[rectoptions.w, 0], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
 	ry = viewX.distanceBTWgraphToSvg([0,0],[0, rectoptions.h], gdata.xmin, gdata.xmax, gdata.ymin, gdata.ymax, aratio)
@@ -2065,9 +3024,12 @@ viewX.updateRectangle = function(graphname, rectname, rectvalueupdate) {
 	rectElement.setAttribute('y', viewX.graphToScaledY(rectoptions.y, gdata.ymin, gdata.ymax, aratio) + '%');
 	rectElement.setAttribute('width', rx + '%')
 	rectElement.setAttribute('height', ry + '%');
+	rectElement.setAttribute('stroke-dasharray', rectoptions.strokedasharray);
+
 	rectElement.style.fill = rectoptions.rectcolor
 	rectElement.style.strokeWidth = rectoptions.strokewidth + '%';
 	rectElement.style.stroke = rectoptions.stroke;
+	rectElement.style.opacity = rectoptions.opacity;
 
 	
 	viewX.graphData[graphname].rectData[rectname] = [rectElement, rectoptions]
@@ -2078,7 +3040,7 @@ viewX.addPoint = function(graphname, pointname, pointoptions) {
 	aratio = gdata.aspectratio
 
 	pointoptions = pointoptions || {}
-
+	viewX.graphData.objectType[pointname] = 'point'
 	if (pointoptions.x != 0) {
 		pointoptions.x = pointoptions.x || 0.3	
 	}
@@ -2090,6 +3052,10 @@ viewX.addPoint = function(graphname, pointname, pointoptions) {
 	pointoptions.name = pointname || viewX.uid
 
 	pointoptions.pointcolor = pointoptions.pointcolor || 'hsla(190, 100%, 50%, 1)'
+
+	if (pointoptions.opacity == undefined) {
+		pointoptions.opacity = 1
+	}
 	
 	var pointElement = document.createElementNS("http://www.w3.org/2000/svg", 'ellipse');
 	pointElement.setAttribute('cx', viewX.graphToScaledX(pointoptions.x, gdata.xmin, gdata.xmax, aratio) + '%');
@@ -2100,6 +3066,7 @@ viewX.addPoint = function(graphname, pointname, pointoptions) {
 	viewX.uid = viewX.uid + 1
 	pointElement.setAttribute('vector-effect','non-scaling-stroke');
 	pointElement.style.fill = pointoptions.pointcolor
+	pointElement.style.opacity = pointoptions.opacity;
 	gdata.svgElement.appendChild(pointElement);
 
 	pointoptions.draggability = pointoptions.draggability || 'no'
@@ -2116,6 +3083,9 @@ viewX.addPoint = function(graphname, pointname, pointoptions) {
 		pointElement.addEventListener('mousedown', viewX.pointDrag)
 		pointElement.addEventListener('touchstart', viewX.pointDrag)
 		gdata.svgElement.addEventListener('touchmove', viewX.graphTouchDisable)
+
+		pointElement.style.cursor = 'move'
+		pointElement.style.pointerEvents = 'auto'
 	}
 	else {
 		pointElement.style.pointerEvents = 'none'
@@ -2135,16 +3105,23 @@ viewX.updatePoint = function(graphname, pointname, newpointoptions) {
 	pointElement = gdata.pointData[pointname][0]
 	aratio = gdata.aspectratio
 
-	if (pointoptions.x != 0) {
-		pointoptions.x = newpointoptions.x || pointoptions.x
+	if (newpointoptions.x != undefined) {
+		pointoptions.x = newpointoptions.x;
 	}
-	if (pointoptions.y != 0) {
-		pointoptions.y = newpointoptions.x || pointoptions.y
+	if (newpointoptions.y != undefined) {
+		pointoptions.y = newpointoptions.y;
 	}
+
+
+
 	// pointoptions.y = pointoptions.y || 0.3
 	pointoptions.pointsize = newpointoptions.pointsize || pointoptions.pointsize
 
 	pointoptions.pointcolor = newpointoptions.pointcolor || pointoptions.pointcolor
+
+	if (newpointoptions.opacity !== undefined) {
+		pointoptions.opacity = newpointoptions.opacity
+	}
 	
 	pointElement.setAttribute('cx', viewX.graphToScaledX(pointoptions.x, gdata.xmin, gdata.xmax, aratio) + '%');
 	pointElement.setAttribute('cy', viewX.graphToScaledY(pointoptions.y, gdata.ymin, gdata.ymax, aratio) + '%');
@@ -2152,6 +3129,7 @@ viewX.updatePoint = function(graphname, pointname, newpointoptions) {
 	pointElement.setAttribute('ry', pointoptions.pointsize + '%');
 	pointElement.setAttribute('vector-effect','non-scaling-stroke');
 	pointElement.style.fill = pointoptions.pointcolor
+	pointElement.style.opacity = pointoptions.opacity;
 
 	pointoptions.draggability = newpointoptions.draggability || 'no'
 	if (pointoptions.draggability == 'yes') {
@@ -2195,47 +3173,125 @@ viewX.updatePointXY = function(graphname, pointname, xvalue, yvalue) {
 	viewX.graphData[graphname].pointData[pointname] = [pointElement, pointoptions]
 }
 
+viewX.updateObjects = function(objectsNamesAndProperties) {
+	for (obj = 0; obj < objectsNamesAndProperties.length; obj++) {
+		theObjectName = objectsNamesAndProperties[obj]['objectName']
+		graphname = objectsNamesAndProperties[obj]['graphName']
+		propertyValuesToSet = objectsNamesAndProperties[obj]['properties']
+		viewX.updateObjectProperty(graphname, theObjectName, propertyValuesToSet)
+	}
+}
+
+viewX.updateObjectProperty = function(graphname, objectName, propertyValuesToSet) {
+	if (viewX.graphData.objectType[objectName] == 'line') {
+		viewX.updateLine(graphname, theObjectName, propertyValuesToSet)
+	}
+	else if (viewX.graphData.objectType[objectName] == 'rectangle') {
+		viewX.updateRectangle(graphname, theObjectName, propertyValuesToSet)
+	}
+	else if (viewX.graphData.objectType[objectName] == 'circle') {
+		viewX.updateCircle(graphname, theObjectName, propertyValuesToSet)
+	}
+	else if (viewX.graphData.objectType[objectName] == 'point') {
+		viewX.updatePoint(graphname, theObjectName, propertyValuesToSet)
+	}
+	else if (viewX.graphData.objectType[objectName] == 'text') {
+		viewX.updateText(graphname, theObjectName, propertyValuesToSet)
+	}
+	else if (viewX.graphData.objectType[objectName] == 'path') {
+		viewX.updatePath(graphname, theObjectName, propertyValuesToSet)
+	}
+	else if (viewX.graphData.objectType[objectName] == 'arrow') {
+		viewX.updateArrow(graphname, theObjectName, propertyValuesToSet)
+	}
+}
+
+
+
+
+
+
+
+
+
 viewX.removePoint = function(graphname, pointname) {
-	pointElement = document.getElementById(graphname + '-point-' + pointname)
+	if (typeof viewX.graphData[graphname].pointData[pointname] != 'undefined') {
+		pointElement = document.getElementById(graphname + '-point-' + pointname)
+		
+		pointElement.outerHTML = "";
+		delete viewX.reverseGraphElementMap[pointElement.id]
+		delete viewX.graphData[graphname].pointData[pointname]
+		delete viewX.graphData.objectType[pointname]
+		
+	}
 	
-	pointElement.outerHTML = "";
-	delete viewX.graphData[graphname].pointData[pointname]
 }
 
 viewX.removeLine = function(graphname, linename) {
-	lineElement = document.getElementById(graphname + '-line-' + linename)
-	lineElement.outerHTML = "";
-	delete viewX.graphData[graphname].lineData[linename]
+	if (typeof viewX.graphData[graphname].lineData[linename] != 'undefined') {
+		lineElement = document.getElementById(graphname + '-line-' + linename)
+		
+		lineElement.outerHTML = "";
+		delete viewX.graphData.objectType[linename]
+		delete viewX.graphData[graphname].lineData[linename]
+	}
 }
 
 viewX.removeCircle = function(graphname, circlename) {
-	circleElement = document.getElementById(graphname + '-circle-' + circlename)
-	circleElement.outerHTML = "";
-	delete viewX.graphData[graphname].circleData[circlename]
+	if (typeof viewX.graphData[graphname].circleData[circlename] != 'undefined') {
+		circleElement = document.getElementById(graphname + '-circle-' + circlename)
+		
+		circleElement.outerHTML = "";
+		delete viewX.graphData[graphname].circleData[circlename]
+		delete viewX.graphData.objectType[circlename]
+	}
 }
 
 viewX.removeText = function(graphname, textname) {
-	textElement = document.getElementById(graphname + '-text-' + textname)
-	textElement.outerHTML = "";
-	delete viewX.graphData[graphname].textData[textname]
+	if (typeof viewX.graphData[graphname].textData[textname] != 'undefined') {
+		textElement = document.getElementById(graphname + '-text-' + textname)
+		textElement.outerHTML = "";
+		delete viewX.graphData[graphname].textData[textname]
+		delete viewX.graphData.objectType[textname]
+	}
 }
 
 viewX.removePath = function(graphname, pathname) {
-	pathElement = document.getElementById(graphname + '-path-' + pathname)
-	pathElement.outerHTML = "";
-	delete viewX.graphData[graphname].pathData[pathname]
+	if (typeof viewX.graphData[graphname].pathData[pathname] != 'undefined') {
+		pathElement = document.getElementById(graphname + '-path-' + pathname)
+		pathElement.outerHTML = "";
+		delete viewX.graphData[graphname].pathData[pathname]
+		delete viewX.graphData.objectType[pathname]
+	}
 }
 
 viewX.removeArrow = function(graphname, arrowname) {
-	arrowElement = document.getElementById(graphname + '-arrow-' + arrowname)
-	arrowElement.outerHTML = "";
-	delete viewX.graphData[graphname].arrowData[arrowname]
+	if (typeof viewX.graphData[graphname].arrowData[arrowname] != 'undefined') {
+		arrowElement = document.getElementById(graphname + '-arrow-' + arrowname)
+		arrowElement.outerHTML = "";
+		delete viewX.graphData[graphname].arrowData[arrowname]
+		delete viewX.graphData.objectType[arrowname]
+	}
+}
+
+viewX.removeRectangle = function(graphname, rectname) {
+	if (typeof viewX.graphData[graphname].rectData[rectname] != 'undefined') {
+		rectElement = document.getElementById(graphname + '-rect-' + rectname)
+		
+		rectElement.outerHTML = "";
+		delete viewX.graphData.objectType[rectname]
+		delete viewX.graphData[graphname].rectData[rectname]
+	}
 }
 
 viewX.removeGraph = function(graphname) {
-	graphElement = document.getElementById(graphname)
-	graphElement.outerHTML = "";
-	delete viewX.graphData[graphname]
+    if (typeof viewX.graphData[graphname] != 'undefined') {
+        graphElement = document.getElementById(graphname)
+        graphElement.outerHTML = "";
+        delete viewX.graphData[graphname]
+        delete viewX.graphData.objectType[graphname]
+    }
+	
 }
 
 viewX.basicSlider = function(graphname2, slidernamebasic, maxv, minv, currentv, thickness, coordinates) {
@@ -2252,18 +3308,17 @@ viewX.basicSlider = function(graphname2, slidernamebasic, maxv, minv, currentv, 
 	viewX.addSlider(graphname2, slidernamebasic, options)
 }
 
-viewX.makeArc = function(arcradius, arcthickness, arccolor, startanglepercent, endanglepercent, ringname) {
-	resolution = 100
+viewX.makeArc = function(gphname, ringname, arcradius, arccenter, arcthickness, arccolor, startanglepercent,endanglepercent, resolution) {
 	arcpoints = []
 	for (p = startanglepercent*resolution; p < endanglepercent*(resolution + 1); p++) {
 		quanta = 2*Math.PI/resolution
-		arcpoints.push([arcradius*Math.cos(quanta*p), arcradius*Math.sin(quanta*p)])
+		arcpoints.push([arccenter[0] + arcradius*Math.cos(quanta*p), arccenter[1] + arcradius*Math.sin(quanta*p)])
 	}
 	options = {}
 	options.points = arcpoints
 	options.pathcolor = arccolor
 	options.strokewidth = arcthickness
-	viewX.addPath('ringvisualgraph', ringname, options)
+	viewX.addPath(gphname, ringname, options)
 	// console.log(options.points)
 
 	return arcpoints
@@ -2292,60 +3347,97 @@ viewX.deleteSegments = function(collection) {
 	}
 }
 
-viewX.randomChoice = function(choicearray) {
-	return choicearray[parseInt(Math.random()*choicearray.length)]
-}
-
-viewX.randomWeightedChoice = function(choicearray, weightArray) {
-	if (choicearray.length == weightArray.length) {
-		weightSumA = weightArray.reduce(function(a, b) { return a + b; }, 0);
-		weightvalueChosen = Math.random()*weightSumA
-		weightSumZ = 0
-		for (weightIndex = 0; weightIndex < weightArray.length; weightIndex++) {
-			weightSumZ = weightSumZ + weightArray[weightIndex]
-			if (weightSumZ >= weightvalueChosen) {
-				indexchosenW = weightIndex
-				break
-			}
-		}
-		return choicearray[indexchosenW]
-	}
-		
-}
-
-viewX.linearValue = function(xv1, xv2, yv1, yv2, inputvl) {
-	return yv1 + ((inputvl - xv1)/(xv2 - xv1))*(yv2 - yv1)
-}
 
 viewX.currentMovingPoint = ''
 
 viewX.pointDrag = function(event) {
 	gphname = viewX.reverseGraphElementMap[event.target.id][0]
 	ptname = viewX.reverseGraphElementMap[event.target.id][1]
-	if (viewX.graphData[gphname].pointData[ptname][1].currentlyDraggable == 'yes') {
-		if (viewX.graphData[gphname].currentlyDraggableGraph == 'yes') {
-			document.getElementById(gphname).removeEventListener('mousedown', viewX.graphDragHandle)
-			document.getElementById(gphname).removeEventListener('touchstart', viewX.graphDragHandle)
+	if (viewX.graphData[gphname] != null) {
+		if (viewX.graphData[gphname].pointData[ptname][1].currentlyDraggable == 'yes') {
+			if (viewX.graphData[gphname].currentlyDraggableGraph == 'yes') {
+				document.getElementById(gphname).removeEventListener('mousedown', viewX.graphDragHandle)
+				document.getElementById(gphname).removeEventListener('touchstart', viewX.graphDragHandle)
+			}
+			event.target.removeEventListener('mousedown', viewX.pointDrag)
+			event.target.removeEventListener('touchstart', viewX.pointDrag)
+			window.addEventListener('mousemove', viewX.pointMoveEvent)
+			window.addEventListener('mouseup', viewX.pointUpEvent)
+			event.preventDefault()
+			window.addEventListener('touchmove', viewX.pointMoveEvent, { passive: false })
+			window.addEventListener('touchend', viewX.pointUpEvent)
+			// window.addEventListener('mouseout', viewX.pointUpEvent)
+			viewX.currentMovingPoint = event.target
 		}
-		event.target.removeEventListener('mousedown', viewX.pointDrag)
-		event.target.removeEventListener('touchstart', viewX.pointDrag)
-		window.addEventListener('mousemove', viewX.pointMoveEvent)
-		window.addEventListener('mouseup', viewX.pointUpEvent)
-		event.preventDefault()
-		window.addEventListener('touchmove', viewX.pointMoveEvent, { passive: false })
-		window.addEventListener('touchend', viewX.pointUpEvent)
-		// window.addEventListener('mouseout', viewX.pointUpEvent)
-		viewX.currentMovingPoint = event.target
 	}
+
 		
+}
+
+viewX.getHTMLCoordinates = function(graphname, x, y) {
+	gdata = viewX.graphData[graphname]
+	aratio = gdata.aspectratio
+	htmlCoordinates = {}
+
+	htmlCoordinates.x = viewX.graphToScaledX(x, gdata.xmin, gdata.xmax, aratio);
+	htmlCoordinates.y = viewX.graphToScaledY(y, gdata.ymin, gdata.ymax, aratio);
+
+	var rect = document.getElementById(graphname).getBoundingClientRect();
+	htmlCoordinates.x = htmlCoordinates.x*0.01*rect.width;
+	htmlCoordinates.y = htmlCoordinates.y*0.01*rect.height;
+
+	return htmlCoordinates
 }
 
 viewX.svgPTVariable = {}
 
+
 viewX.pointMoveEvent = function(event) {
 	event.preventDefault()
 	gphname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][0]
-	ptname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][1]
+	if (viewX.graphData[gphname] != null) {
+		ptname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][1]
+		var rect = document.getElementById(gphname).getBoundingClientRect();
+		posx = event.clientX - rect.left;
+		posy = event.clientY - rect.top;
+		viewX.svgPTVariable[gphname].x = event.clientX;
+		viewX.svgPTVariable[gphname].y = event.clientY;
+
+		if (event.clientX == undefined) {
+			posx = event.changedTouches[0].clientX - rect.left;
+			posy = event.changedTouches[0].clientY - rect.top;
+			viewX.svgPTVariable[gphname].x = event.changedTouches[0].clientX;
+			viewX.svgPTVariable[gphname].y = event.changedTouches[0].clientY;
+		}
+
+		var cursorpt =  viewX.svgPTVariable[gphname].matrixTransform(document.getElementById(gphname).getScreenCTM().inverse());
+
+		moveX = viewX.svgToGraphX(cursorpt.x, viewX.graphData[gphname].xmin,viewX.graphData[gphname].xmax, viewX.graphData[gphname].aspectratio)
+		moveY = viewX.svgToGraphY(cursorpt.y, viewX.graphData[gphname].ymin,viewX.graphData[gphname].ymax, viewX.graphData[gphname].aspectratio)
+
+		if (typeof eval(viewX.graphData[gphname].pointData[ptname][1].dragIfCondition) != undefined) {
+			if (eval(viewX.graphData[gphname].pointData[ptname][1].dragIfCondition) == true) {
+				if (viewX.graphData[gphname].pointData[ptname][1].dragDirection == 'bothXY') {
+					viewX.updatePointXY(gphname, ptname, moveX, moveY)
+					eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionDuringDrag)
+				}
+				else if (viewX.graphData[gphname].pointData[ptname][1].dragDirection == 'onlyY') {
+					viewX.updatePointXY(gphname, ptname, viewX.graphData[gphname].pointData[ptname][1].x, moveY)
+					eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionDuringDrag)
+				}
+				else if (viewX.graphData[gphname].pointData[ptname][1].dragDirection == 'onlyX') {
+					viewX.updatePointXY(gphname, ptname, moveX, viewX.graphData[gphname].pointData[ptname][1].y)
+					eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionDuringDrag)
+				}
+			}
+		}
+	}
+}
+
+viewX.cursorCoordinates = {}
+
+viewX.getCoordinatesOfEvent = (gphname, runFunctionAtEnd) => (event) => {
+	event.preventDefault()
 	var rect = document.getElementById(gphname).getBoundingClientRect();
 	posx = event.clientX - rect.left;
 	posy = event.clientY - rect.top;
@@ -2361,69 +3453,35 @@ viewX.pointMoveEvent = function(event) {
 
 	var cursorpt =  viewX.svgPTVariable[gphname].matrixTransform(document.getElementById(gphname).getScreenCTM().inverse());
 
-	moveX = viewX.svgToGraphX(cursorpt.x, viewX.graphData[gphname].xmin,viewX.graphData[gphname].xmax, viewX.graphData[gphname].aspectratio)
-	moveY = viewX.svgToGraphY(cursorpt.y, viewX.graphData[gphname].ymin,viewX.graphData[gphname].ymax, viewX.graphData[gphname].aspectratio)
-
-	if (typeof eval(viewX.graphData[gphname].pointData[ptname][1].dragIfCondition) != undefined) {
-		if (eval(viewX.graphData[gphname].pointData[ptname][1].dragIfCondition) == true) {
-			if (viewX.graphData[gphname].pointData[ptname][1].dragDirection == 'bothXY') {
-				viewX.updatePointXY(gphname, ptname, moveX, moveY)
-				eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionDuringDrag)
-			}
-			else if (viewX.graphData[gphname].pointData[ptname][1].dragDirection == 'onlyY') {
-				viewX.updatePointXY(gphname, ptname, viewX.graphData[gphname].pointData[ptname][1].x, moveY)
-				eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionDuringDrag)
-			}
-			else if (viewX.graphData[gphname].pointData[ptname][1].dragDirection == 'onlyX') {
-				viewX.updatePointXY(gphname, ptname, moveX, viewX.graphData[gphname].pointData[ptname][1].y)
-				eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionDuringDrag)
-			}
-		}
-	}
-}
-
-viewX.svgPTVariableForGettingCoordinates = {}
-viewX.getCoordinatesOfEvent = function(gphname, event) {
-	event.preventDefault()
-	var rect = document.getElementById(gphname).getBoundingClientRect();
-	posx = event.clientX - rect.left;
-	posy = event.clientY - rect.top;
-	viewX.svgPTVariableForGettingCoordinates[gphname].x = event.clientX;
-	viewX.svgPTVariableForGettingCoordinates[gphname].y = event.clientY;
-
-	if (event.clientX == undefined) {
-		posx = event.changedTouches[0].clientX - rect.left;
-		posy = event.changedTouches[0].clientY - rect.top;
-		viewX.svgPTVariableForGettingCoordinates[gphname].x = event.changedTouches[0].clientX;
-		viewX.svgPTVariableForGettingCoordinates[gphname].y = event.changedTouches[0].clientY;
-	}
-
-	var cursorpt =  viewX.svgPTVariableForGettingCoordinates[gphname].matrixTransform(document.getElementById(gphname).getScreenCTM().inverse());
-
 	coordinatesX = viewX.svgToGraphX(cursorpt.x, viewX.graphData[gphname].xmin,viewX.graphData[gphname].xmax, viewX.graphData[gphname].aspectratio)
 	coordinatesY = viewX.svgToGraphY(cursorpt.y, viewX.graphData[gphname].ymin,viewX.graphData[gphname].ymax, viewX.graphData[gphname].aspectratio)
+	viewX.cursorCoordinates[gphname] = [coordinatesX, coordinatesY]
+	window[runFunctionAtEnd]()
+
 	return [coordinatesX, coordinatesY]
 }
 
 viewX.pointUpEvent = function(event) {
 	gphname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][0]
-	ptname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][1]
-	if (viewX.graphData[gphname].currentlyDraggableGraph == 'yes') {
-		document.getElementById(gphname).addEventListener('mousedown', viewX.graphDragHandle)
-		document.getElementById(gphname).addEventListener('touchstart', viewX.graphDragHandle)
-	}
-	viewX.currentMovingPoint.addEventListener('mousedown', viewX.pointDrag)
-	viewX.currentMovingPoint.addEventListener('touchstart', viewX.pointDrag)
-	window.removeEventListener('mousemove', viewX.pointMoveEvent)
-	window.removeEventListener('mouseup', viewX.pointUpEvent)
-	window.removeEventListener('touchmove', viewX.pointMoveEvent)
-	window.removeEventListener('touchend', viewX.pointUpEvent)
+	if (viewX.graphData[gphname] != null) {
+		ptname = viewX.reverseGraphElementMap[viewX.currentMovingPoint.id][1]
+		if (viewX.graphData[gphname].currentlyDraggableGraph == 'yes') {
+			document.getElementById(gphname).addEventListener('mousedown', viewX.graphDragHandle)
+			document.getElementById(gphname).addEventListener('touchstart', viewX.graphDragHandle)
+		}
+		viewX.currentMovingPoint.addEventListener('mousedown', viewX.pointDrag)
+		viewX.currentMovingPoint.addEventListener('touchstart', viewX.pointDrag)
+		window.removeEventListener('mousemove', viewX.pointMoveEvent)
+		window.removeEventListener('mouseup', viewX.pointUpEvent)
+		window.removeEventListener('touchmove', viewX.pointMoveEvent)
+		window.removeEventListener('touchend', viewX.pointUpEvent)
 
-	// window.removeEventListener('mouseout', viewX.pointUpEvent)
-	eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionOnDragEnd)
+		// window.removeEventListener('mouseout', viewX.pointUpEvent)
+		eval(viewX.graphData[gphname].pointData[ptname][1].runFunctionOnDragEnd)
+	}
 }
 
-viewX.wheelHandle = function(event) {
+viewX.wheelHandle = (gphname) => (event) => {
 	event.preventDefault();
 	whlvalue = (event.wheelDeltaY)/Math.abs(event.wheelDeltaY)
 	if (event.wheelDeltaY == undefined) {
@@ -2432,12 +3490,11 @@ viewX.wheelHandle = function(event) {
 	}
 	scalefactorup = 1.1
 	scalefactordown = 0.9
-
-	if(viewX.graphData[event.target.id.split('-')[0]] == undefined) {
-
+	if (viewX.graphData[gphname] == undefined) {
+		console.log("Cannot scroll")
 	}
 	else {
-		gdata = viewX.graphData[event.target.id.split('-')[0]]
+		gdata = viewX.graphData[gphname]
 
 		scale = gdata.ymax - gdata.ymin
 		expstring = scale.toExponential().toString()
@@ -2522,9 +3579,9 @@ viewX.wheelHandle = function(event) {
 viewX.currentMovingGraph = ''
 viewX.currentMovingGraphStartLocation = []
 
-viewX.graphDragHandle = function(event) {
+viewX.graphDragHandle = (gphname) => (event) => {
 	event.preventDefault();
-	gphname = event.target.id.split('-')[0]
+	// gphname = event.target.id.split('-')[0]
 	if (viewX.graphData[gphname].currentlyDraggableGraph == 'yes') {
 		viewX.graphData[gphname].svgElement.removeEventListener('mousedown', viewX.graphDragHandle)
 		viewX.graphData[gphname].svgElement.removeEventListener('touchstart', viewX.graphDragHandle)
@@ -2725,8 +3782,8 @@ viewX.graphDragMoveEvent = function(event) {
 viewX.graphDragUpEvent = function(event) {
 	gphname = viewX.currentMovingGraph.id
 
-	viewX.currentMovingGraph.addEventListener('mousedown', viewX.graphDragHandle)
-	viewX.currentMovingGraph.addEventListener('touchstart', viewX.graphDragHandle)
+	viewX.currentMovingGraph.addEventListener('mousedown', viewX.graphDragHandle(gphname))
+	viewX.currentMovingGraph.addEventListener('touchstart', viewX.graphDragHandle(gphname))
 	window.removeEventListener('mousemove', viewX.graphDragMoveEvent)
 	window.removeEventListener('mouseup', viewX.graphDragUpEvent)
 	window.removeEventListener('touchmove', viewX.graphDragMoveEvent)
@@ -2753,58 +3810,427 @@ else if (window.innerWidth > 1.3*window.innerHeight && window.innerWidth > windo
 }
 
 
-viewX.setFont = function(divCollection, fontval) {
-	for (divN = 0; divN < divCollection.length; divN++) {
-		document.getElementById(divCollection[divN]).style.fontSize = fontval
+
+
+// Animations
+viewX.animationData = {}
+
+viewX.addAnimation = function(animname, animoptions) {
+	animdata = {}
+	animoptions = animoptions || {}
+	animoptions.name = animname
+	animoptions.duration = animoptions.duration || 1
+	// in seconds
+
+	animoptions.delay = animoptions.delay || 0
+	// in seconds
+
+	animoptions.repeat = animoptions.repeat || "no"
+	// "yes" or "no"
+
+	animoptions.repeatdelay = animoptions.repeatdelay || 0
+	// in seconds
+
+	// animoptions.easing = animoptions.easing || "linear"
+	// "linear", "easeIn", "easeOut", "easeInOut", "easeInQuad", "easeOutQuad", "easeInOutQuad", "easeInCubic", "easeOutCubic", "easeInOutCubic", "easeInQuart", "easeOutQuart", "easeInOutQuart", "easeInQuint", "easeOutQuint", "easeInOutQuint"
+
+	animoptions.defaultGraph = animoptions.defaultGraph || ""
+	// name of graph
+
+	animoptions.keyframes = animoptions.keyframes || {
+		0 : {}
 	}
-}
 
-viewX.distF = function(pt1, pt2) {
-	return Math.pow(Math.pow(pt1[0] - pt2[0], 2) + Math.pow(pt1[1] - pt2[1], 2), 0.5)
-}
+	// 0 : {
+	// 	"0" : {
+	// 		'graph': graphName,
+	//		'object': objectName, 
+	// 		'options': options,
+	// 	}
+	// }
 
-viewX.addVec = function(pt1, pt2) {
-	return [pt1[0] + pt2[0], pt1[1] + pt2[1]]
-}
+	animdata.objects = {}
 
-viewX.directionVec = function(pt1, pt2) {
-	diff = [pt2[0] - pt1[0], pt2[1] - pt1[1]]
-	difflen = viewX.distF(diff, [0,0])
-	return [diff[0]/difflen, diff[1]/difflen]
-}
+	for (var key in animoptions.keyframes) {
+		for (var objectIndex in animoptions.keyframes[key]) {
+			for (var propertyName in animoptions.keyframes[key][objectIndex].options) {
+				forProperty = animoptions.keyframes[key][objectIndex].graph + "-" + animoptions.keyframes[key][objectIndex].object + "-" + propertyName
 
-viewX.rotatedVec = function(ofVector, angle) {
-	angle = angle*Math.PI/180;
-	rotatedXV = ofVector[0]*Math.cos(angle) - ofVector[1]*Math.sin(angle);
-	rotatedYV = ofVector[0]*Math.sin(angle) + ofVector[1]*Math.cos(angle);
-	return [rotatedXV, rotatedYV]
-}
 
-viewX.mod = function(ofVector) {
-	return viewX.distF(ofVector, [0,0])
-}
+				objectFullName = animoptions.keyframes[key][objectIndex].object + "-FROM-" + animoptions.keyframes[key][objectIndex].graph
+				if (animdata.objects[objectFullName] == undefined) {
+					animdata.objects[objectFullName] = {
+						'keys' : [],
+						'graphName': animoptions.keyframes[key][objectIndex].graph,
+						'objectName': animoptions.keyframes[key][objectIndex].object,
+						'objectType': viewX.graphData.objectType[animoptions.keyframes[key][objectIndex].object],
+						'propertiesToBeAnimated': {},
+						'propertySetCalculatedAtKeys': {}
+					}
+				}
+				if (!animdata.objects[objectFullName]['keys'].includes(key)) {
+					animdata.objects[objectFullName]['keys'].push(key)
+				}
+				
 
-viewX.shuffle = function(array) {
-	var currentIndex = array.length, temporaryValue, randomIndex;
+				if (animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName] == undefined) {
+					animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName] = {}
+				}
 
-	// While there remain elements to shuffle...
-	while (0 !== currentIndex) {
+				animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key] = animoptions.keyframes[key][objectIndex].options[propertyName]
 
-		// Pick a remaining element...
-		randomIndex = Math.floor(Math.random() * currentIndex);
-		currentIndex -= 1;
-
-		// And swap it with the current element.
-		temporaryValue = array[currentIndex];
-		array[currentIndex] = array[randomIndex];
-		array[randomIndex] = temporaryValue;
+			}
+		}
 	}
-	return array;
+	
+	
+	for (var objectFullName in animdata.objects) {
+		for (propertyName in animdata.objects[objectFullName]['propertiesToBeAnimated']) {
+			for (var key in animoptions.keyframes) {
+				if (animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key] == undefined) {
+					totalKeys = Object.keys(animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName]).length
+
+					if (totalKeys == 0) {
+						console.log("Something is wrong, this animation has no keyframes for this property")
+					}
+					else if (totalKeys == 1) {
+						theOnlyKey = Object.keys(animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName])[0]
+						animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key] = animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][theOnlyKey]
+					}
+					else if (totalKeys > 1) {
+						animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key]
+						
+						valuesOfInterest = viewX.libraryFunctions.findClosestRightAndLeftNumbersInArray(Object.keys(animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName]), key)
+
+
+						if (valuesOfInterest[0] == null && valuesOfInterest[1] != null) {
+							assignPropertyAtKey = valuesOfInterest[1]
+							animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key] = animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][assignPropertyAtKey]
+						}
+						else if (valuesOfInterest[1] == null && valuesOfInterest[0] != null) {
+							assignPropertyAtKey = valuesOfInterest[0]
+							animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key] = animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][assignPropertyAtKey]
+						}
+						else if (valuesOfInterest[0] == null && valuesOfInterest[1] == null) {
+							console.log("Something is wrong with given keyframe values", Object.keys(animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName]))
+						}
+						else if (valuesOfInterest[0] != null && valuesOfInterest[1] != null) {
+							propValueAtLeft = animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][valuesOfInterest[0]]
+
+							if (typeof propValueAtLeft === 'number') {
+								propValueAtRight = animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][valuesOfInterest[1]]
+								animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key] = viewX.linearValue(valuesOfInterest[0], valuesOfInterest[1], propValueAtLeft, propValueAtRight, key)
+							}
+							else {
+								animdata.objects[objectFullName]['propertiesToBeAnimated'][propertyName][key] = propValueAtLeft
+							}
+							
+						}
+
+					}
+				}
+			}
+		}
+		
+	}
+
+
+	animoptions.animationAt = animoptions.animationAt || 0
+	animoptions.playing = animoptions.playing || 'no'
+
+	viewX.animationData[animname] = [animdata, animoptions]
+	
+	return viewX.animationData[animname]
 }
+
+viewX.setAnimationFrame = function(animname, atKey) {
+	animoptions = viewX.animationData[animname][1]
+	animdata = viewX.animationData[animname][0]
+
+	atKey = atKey || 0
+
+	for (var animObject in animdata.objects) {
+		
+		propertyValuesToSet = animdata.objects[animObject]['propertySetCalculatedAtKeys'][atKey]
+		if (propertyValuesToSet == undefined) {
+			propertyValuesToSet = {}
+		}
+		if (animdata.objects[animObject]['propertySetCalculatedAtKeys'][atKey] === undefined) {
+			for (var propertyName in animdata.objects[animObject]['propertiesToBeAnimated']) {
+				keyStonesAvailableForProp = Object.keys(animdata.objects[animObject]['propertiesToBeAnimated'][propertyName])
+				if (keyStonesAvailableForProp.includes(atKey.toString())) {
+					propertyValuesToSet[propertyName] = animdata.objects[animObject]['propertiesToBeAnimated'][propertyName][atKey]
+				}
+				else {
+					valuesOfInterest = viewX.libraryFunctions.findClosestRightAndLeftNumbersInArray(keyStonesAvailableForProp, atKey)
+					if (valuesOfInterest[0] == null && valuesOfInterest[1] != null) {
+						assignPropertyAtKey = valuesOfInterest[1]
+						propertyValuesToSet[propertyName] = animdata.objects[animObject]['propertiesToBeAnimated'][propertyName][assignPropertyAtKey]
+					}
+					else if (valuesOfInterest[1] == null && valuesOfInterest[0] != null) {
+						assignPropertyAtKey = valuesOfInterest[0]
+						propertyValuesToSet[propertyName] = animdata.objects[animObject]['propertiesToBeAnimated'][propertyName][assignPropertyAtKey]
+					}
+					else if (valuesOfInterest[0] == null && valuesOfInterest[1] == null) {
+						console.log("Something is wrong with given keyframe values", Object.keys(animdata.objects[animObject]['propertiesToBeAnimated'][propertyName]))
+					}
+					else if (valuesOfInterest[0] != null && valuesOfInterest[1] != null) {
+						propValueAtLeft = animdata.objects[animObject]['propertiesToBeAnimated'][propertyName][valuesOfInterest[0]]
+						if (typeof propValueAtLeft === 'number') {
+							propValueAtRight = animdata.objects[animObject]['propertiesToBeAnimated'][propertyName][valuesOfInterest[1]]
+							propertyValuesToSet[propertyName] = viewX.linearValue(valuesOfInterest[0], valuesOfInterest[1], propValueAtLeft, propValueAtRight, atKey)
+						}
+						else if (propertyName == 'pointcolor' || propertyName == 'linecolor' || propertyName == 'circlecolor' || propertyName == 'rectcolor' || propertyName == 'textcolor' || propertyName == 'ellipsecolor' || propertyName == 'pathcolor') {
+							propValueAtRight = animdata.objects[animObject]['propertiesToBeAnimated'][propertyName][valuesOfInterest[1]]
+
+							propertyValuesToSet[propertyName] = viewX.libraryFunctions.hueSupressedInterpolationHSLA(propValueAtLeft, propValueAtRight, valuesOfInterest[0], valuesOfInterest[1], atKey)
+						}
+						else if (propertyName == 'points' && animdata.objects[animObject]['objectType'] == 'path') {
+							propValueAtRight = animdata.objects[animObject]['propertiesToBeAnimated'][propertyName][valuesOfInterest[1]]
+
+							if (propValueAtRight[0].command == null) {
+
+								// console.log(propValueAtRight)
+
+								
+
+								
+
+								// numberOfPointsToInclude = propertyValuesToSet[propertyName].length
+								// console.log(parseInt(numberOfPointsToInclude))
+
+								// slice Array
+
+								// viewX.linearValueFiltered = function(xv1, xv2, yv1, yv2, inputvl, filterFunction=viewX.filterFunctions.identity, filterParameters={})
+
+								if (animoptions.drawPointsSequentially == 'yes') {
+									
+									numberOfPointsToInclude = viewX.linearValueFiltered(valuesOfInterest[0], valuesOfInterest[1], propValueAtLeft.length, propValueAtRight.length, atKey, viewX.filterFunctions.easeIn, {easeInPercentage:0.5})
+
+									propertyValuesToSet[propertyName] = propValueAtRight.slice(0, parseInt(numberOfPointsToInclude))
+								}
+								else {
+									propertyValuesToSet[propertyName] = viewX.libraryFunctions.interpolateArrayOfPoints(valuesOfInterest[0], valuesOfInterest[1], propValueAtLeft, propValueAtRight, atKey)
+								}
+								
+							}
+							else {
+								
+								if (animoptions.drawPointsSequentially == 'yes') {
+									
+									numberOfPointsToInclude = viewX.linearValueFiltered(valuesOfInterest[0], valuesOfInterest[1], propValueAtLeft.length, propValueAtRight.length, atKey, viewX.filterFunctions.easeIn, {easeInPercentage:0.5})
+
+
+									propertyValuesToSet[propertyName] = propValueAtRight.slice(0, parseInt(numberOfPointsToInclude))
+								}
+								else {
+									propertyValuesToSet[propertyName] = viewX.libraryFunctions.interpolateArrayOfPointsWithCommands(valuesOfInterest[0], valuesOfInterest[1], propValueAtLeft, propValueAtRight, atKey)
+								}
+
+							}
+						}
+						else {
+							propertyValuesToSet[propertyName] = propValueAtLeft
+						}
+						
+					}
+				}
+			}
+
+		}
+
+		graphOfObject = animdata.objects[animObject]['graphName']
+		theObjectName = animdata.objects[animObject]['objectName']
+		
+		// check if object exists 
+		if (viewX.graphData.objectType[theObjectName] != undefined && viewX.graphData.objectType[theObjectName] != null) {
+
+			if (animdata.objects[animObject]['objectType'] == 'line') {
+				viewX.updateLine(graphOfObject, theObjectName, propertyValuesToSet)
+			}
+			else if (animdata.objects[animObject]['objectType'] == 'rectangle') {
+				viewX.updateRectangle(graphOfObject, theObjectName, propertyValuesToSet)
+			}
+			else if (animdata.objects[animObject]['objectType'] == 'circle') {
+				viewX.updateCircle(graphOfObject, theObjectName, propertyValuesToSet)
+			}
+			else if (animdata.objects[animObject]['objectType'] == 'point') {
+				viewX.updatePoint(graphOfObject, theObjectName, propertyValuesToSet)
+			}
+			else if (animdata.objects[animObject]['objectType'] == 'text') {
+				viewX.updateText(graphOfObject, theObjectName, propertyValuesToSet)
+			}
+			else if (animdata.objects[animObject]['objectType'] == 'path') {
+				viewX.updatePath(graphOfObject, theObjectName, propertyValuesToSet)
+			}
+			else if (animdata.objects[animObject]['objectType'] == 'arrow') {
+				viewX.updateArrow(graphOfObject, theObjectName, propertyValuesToSet)
+			}
+		}
+
+		animdata.objects[animObject]['propertySetCalculatedAtKeys'][atKey] = propertyValuesToSet
+
+	}
+
+	animoptions.animationAt = atKey
+
+	viewX.animationData[animname][0] = Object.assign({}, animdata)
+	viewX.animationData[animname][1] = Object.assign({}, animoptions)
+
+}
+
+
+viewX.playAnimation = function(animname, startKey, endKey, animDuration, frameRate) {
+	animoptions = viewX.animationData[animname][1]
+	animdata = viewX.animationData[animname][0]
+
+	animoptions.duration = animDuration || animoptions.duration
+
+
+	if (startKey === undefined) {
+		startKey = 0
+	}
+
+	if (endKey === undefined) {
+		endKey = Object.keys(animoptions.keyframes).length - 1
+	}
+
+	
+	if (frameRate != undefined) {
+		animoptions.frameRate = frameRate
+	}
+	else {
+		animoptions.frameRate = 30
+	}
+	
+
+	animoptions.startKey = startKey
+	animoptions.endKey = endKey
+
+	animoptions.animationDelta =  ((endKey - startKey)/(animoptions.duration*animoptions.frameRate))
+
+	animoptions.playing = 'yes'
+	animoptions.animationAt = startKey
+
+	
+	viewX.animationData[animname][1] = Object.assign({}, animoptions)
+
+
+
+	if (animoptions.duration == 0) {
+		animoptions.playing = 'yes'
+		animoptions.animationAt = startKey
+		viewX.setAnimationFrame(animname, endKey)
+		animoptions.playing = 'no'
+	}
+	else {
+		if (endKey != startKey) {
+		
+			viewX.animationIntervals[animname] = setInterval(function() {
+				animoptions = viewX.animationData[animname][1]
+				animoptions.animationAt = animoptions.animationAt + animoptions.animationDelta
+				if (animoptions.endKey > animoptions.startKey) {
+					if (animoptions.endKey - animoptions.animationDelta <= animoptions.animationAt) {
+						viewX.setAnimationFrame(animname, animoptions.endKey)
+						viewX.stopAnimation(animname)
+					}
+					else {
+						viewX.setAnimationFrame(animname, animoptions.animationAt)
+					}
+				}
+				else {
+					if (animoptions.endKey >= animoptions.animationAt - animoptions.animationDelta) {
+						viewX.setAnimationFrame(animname, animoptions.endKey)
+						viewX.stopAnimation(animname)
+					}
+					else {
+						viewX.setAnimationFrame(animname, animoptions.animationAt)
+					}
+				}
+				
+			}, 1000/animoptions.frameRate);
+		}
+		else {
+			console.log("Error with given start and end keys. They are equal")
+		}
+	}
+
+
+	
+
+	return viewX.animationData[animname]
+
+}
+
+
+viewX.stopAnimation = function(animname) {
+	clearInterval(viewX.animationIntervals[animname])
+}
+
+viewX.playAnimationToFrame = function(animname, atKey, animDuration, frameRate) {
+	viewX.stopAnimation(animname);
+	viewX.playAnimation(animname, viewX.animationData[animname][1].animationAt, atKey, animDuration, frameRate)
+}
+
+
+
+
+viewX.cursorToGraph = function(cursorX, cursorY, graphName) {
+	viewX.svgPTVariable[graphName].x = cursorX
+	viewX.svgPTVariable[graphName].y = cursorY
+
+	// if (event.clientX == undefined) {
+	// 	posx = event.changedTouches[0].clientX - rect.left;
+	// 	posy = event.changedTouches[0].clientY - rect.top;
+	// 	viewX.svgPTVariable[graphName].x = event.changedTouches[0].clientX;
+	// 	viewX.svgPTVariable[graphName].y = event.changedTouches[0].clientY;
+	// }
+
+	var cursorpt =  viewX.svgPTVariable[graphName].matrixTransform(document.getElementById(graphName).getScreenCTM().inverse());
+
+	returnX = viewX.svgToGraphX(cursorpt.x, viewX.graphData[graphName].xmin,viewX.graphData[graphName].xmax, viewX.graphData[graphName].aspectratio)
+	returnY = viewX.svgToGraphY(cursorpt.y, viewX.graphData[graphName].ymin,viewX.graphData[graphName].ymax, viewX.graphData[graphName].aspectratio)
+
+	return [returnX, returnY]
+}
+
+
+viewX.moveToTop = function(graphname, elementname) {
+	elementType = viewX.graphData.objectType[elementname]
+	element = viewX.graphData[graphname][elementType + 'Data'][elementname][0]
+    let svgContainer = element.parentElement;
+    svgContainer.removeChild(element);
+    svgContainer.appendChild(element);
+}
+
+
+
+// viewX.charts = {}
+// viewX.charts.list = {}
+
+// viewX.charts.lineChart = function(name, data, options) {
+// 	if (name == undefined) {
+// 		name = 'lineChart-' + viewX.uid
+// 		viewX.uid += 1
+// 	}
+
+// 	if (data == undefined) {
+// 		data = [[0,0], [1,1]]
+// 	}
+
+
+// }
+
+
+
 
 viewX.uid = 0
 viewX.graphData = {}
+viewX.graphData.objectType = {}
+
+viewX.animationIntervals = {}
 
 viewX.reverseGraphElementMap = {}
 
 viewX.darkmode = false;
+
